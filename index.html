@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4_meses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/desktop.css">
+<link rel="stylesheet" href="css/windows.css">
+<link rel="stylesheet" href="css/apps.css">
+</head>
+<body>
+
+<div id="boot-screen">
+  <div>WinGei98 BIOS v4.0<br>(C) cápsula del tiempo, todos los derechos del corazón reservados<br><br></div>
+  <div id="boot-lines"></div>
+  <div id="boot-bar"><div id="boot-bar-fill"></div></div>
+  <div style="margin-top:8px;font-size:12px;">cargando 4 meses<span class="blink">_</span></div>
+</div>
+
+<div id="desktop">
+  <div class="desktop-icons" id="desktop-icons"></div>
+</div>
+
+<div id="windows-layer"></div>
+
+<div id="start-menu">
+  <div class="start-side"><span>WinGei 98</span></div>
+  <div class="start-list" id="start-list"></div>
+</div>
+
+<div id="taskbar">
+  <button id="start-btn" class="pixel-btn"><span class="flag">🩷</span>Inicio</button>
+  <div class="tb-sep"></div>
+  <div id="taskbar-apps"></div>
+  <div id="systray"><span id="clock">00:00</span></div>
+</div>
+
+<div id="shutdown-screen">
+  <div class="big" id="shutdown-msg">Ya puede apagar el equipo.</div>
+  <div class="final" id="shutdown-final"></div>
+</div>
+
+<div id="toast"></div>
+
+<script src="js/sound.js" defer></script>
+<script src="js/data.js" defer></script>
+<script src="js/windowManager.js" defer></script>
+<script src="js/system.js" defer></script>
+</body>
+</html>

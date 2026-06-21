@@ -1,0 +1,58 @@
+/* ---------- APP LAYOUTS ---------- */
+
+/* note styles */
+.note-hand{
+  background:var(--paper);position:relative;padding:12px 15px 15px;
+  font-family:'Caveat',cursive;font-size:18px;line-height:1.35;color:#5a3f55;
+  border:1px solid var(--rose);
+  background-image:repeating-linear-gradient(transparent 0 24px, rgba(232,166,191,.35) 24px 25px);
+}
+.note-hand .sticker{position:absolute;font-size:22px;filter:drop-shadow(1px 1px 0 rgba(74,53,80,.3));}
+.note-mono{
+  background:#fffefb;border:1px solid var(--shadow);padding:10px;
+  font-family:'Courier New',monospace;font-size:12px;white-space:pre-wrap;color:#3c2c40;
+  box-shadow:inset 1px 1px 0 rgba(74,53,80,.15);
+}
+.illo-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.illo-caption{font-family:'Patrick Hand',cursive;font-size:15px;color:var(--shadow);text-align:center;max-width:300px;}
+
+/* fake player */
+.player{display:flex;flex-direction:column;align-items:center;gap:10px;padding:6px 4px;}
+.player-title{font-weight:bold;font-size:13px;}
+.player-artist{font-size:11px;color:var(--shadow);}
+.play-btn{
+  width:44px;height:44px;border-radius:50%;background:var(--blush-deep);
+  display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;
+  border:2px solid var(--ink);
+}
+.waveform{display:flex;align-items:flex-end;gap:2px;height:34px;}
+.waveform span{width:4px;background:var(--lilac-deep);}
+.player-caption{font-size:11px;font-style:italic;color:var(--shadow);text-align:center;max-width:240px;}
+
+/* ---------- BOOT SCREEN ---------- */
+#boot-screen{
+  position:fixed;inset:0;background:#2c2030;color:#f5e6ef;
+  font-family:'Courier New',monospace;font-size:14px;
+  display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+  padding:40px;z-index:9999;white-space:pre-wrap;line-height:1.6;
+}
+#boot-screen .blink{animation:blink 1s steps(1) infinite;}
+@keyframes blink{50%{opacity:0;}}
+#boot-bar{width:280px;height:12px;border:1px solid #f5e6ef;margin-top:14px;position:relative;}
+#boot-bar-fill{height:100%;width:0%;background:#F49AC1;}
+
+/* ---------- SHUTDOWN ---------- */
+#shutdown-screen{
+  position:fixed;inset:0;background:#2c2030;color:#f5e6ef;z-index:9998;display:none;
+  align-items:center;justify-content:center;flex-direction:column;text-align:center;
+  font-family:Tahoma,sans-serif;padding:30px;
+}
+#shutdown-screen.show{display:flex;}
+#shutdown-screen .big{font-size:15px;margin-bottom:18px;}
+#shutdown-screen .final{font-family:'Caveat',cursive;font-size:30px;color:#FBD3E0;max-width:560px;line-height:1.4;opacity:0;transition:opacity 1.2s;}
+#shutdown-screen .final.show{opacity:1;}
+
+.tip-banner{
+  position:fixed;top:0;left:0;right:0;background:var(--ink);color:#fff;font-size:11px;
+  text-align:center;padding:4px;z-index:9500;
+}

@@ -64,7 +64,7 @@ function openItem(item) {
   SND.click();
   if (item.type === 'folder') {
     SND.open();
-    const tracked = ['01_cine_top', '02_despues_del_docu', '03_cosas_que_me_compartiste', '04_metro', '05_sketchbook'];
+    const tracked = ['01_cine_top', '02_despues', '03_cosas_que_me_compartiste', '04_metro', '05_sketchbook'];
     if (tracked.includes(item.name)) {
       visited.add(item.name);
       if (folderUnlocked()) unlockF06();

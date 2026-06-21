@@ -1,0 +1,63 @@
+/* ---------- WINDOWS ---------- */
+.window{
+  position:absolute;min-width:260px;background:var(--cream);
+  box-shadow:
+    inset 1px 1px 0 #fff,
+    inset -1px -1px 0 var(--shadow),
+    2px 2px 0 rgba(74,53,80,.4);
+  border:1px solid var(--ink);
+  display:flex;flex-direction:column;
+}
+.window.dragging{opacity:.94;}
+.titlebar{
+  height:24px;flex:0 0 auto;display:flex;align-items:center;gap:5px;
+  background:linear-gradient(90deg, var(--blush-deep), var(--lilac-deep));
+  color:#fff;padding:0 4px;cursor:default;user-select:none;
+}
+.window.inactive .titlebar{background:linear-gradient(90deg,#e9c6d6,#cdb8de);color:#fdf0f6;}
+.titlebar .ticon{font-size:14px;line-height:1;}
+.titlebar .ttext{flex:1;font-size:12px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:1px 1px 0 rgba(0,0,0,.2);}
+.titlebar-btns{display:flex;gap:2px;}
+.titlebar-btn{
+  width:17px;height:15px;background:var(--blush);
+  border-top:1px solid #fff;border-left:1px solid #fff;
+  border-bottom:1px solid var(--shadow);border-right:1px solid var(--shadow);
+  font-size:10px;line-height:13px;text-align:center;color:var(--ink);font-weight:bold;
+}
+.titlebar-btn:active{border-color:var(--shadow) var(--shadow) #fff #fff;}
+.pathbar{
+  flex:0 0 auto;background:var(--paper);border-bottom:1px solid var(--rose);
+  font-size:11px;padding:3px 6px;display:flex;align-items:center;gap:5px;color:var(--shadow);
+}
+.pathbar .pbox{flex:1;background:#fff;border:1px solid var(--shadow);padding:2px 5px;border-top-color:var(--shadow);}
+.window-body{
+  flex:1 1 auto;overflow:auto;padding:10px;background:var(--cream);position:relative;
+}
+.statusbar{
+  flex:0 0 auto;height:18px;border-top:1px solid var(--shadow);
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:10px;padding:0 6px;color:var(--shadow);background:var(--blush);
+}
+
+.icon-grid{display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;}
+.icon-grid .icon .label{color:var(--ink);text-shadow:none;}
+.icon-grid .icon.selected .label{background:var(--lilac-deep);color:#fff;}
+
+/* dialog */
+.dialog-body{display:flex;gap:12px;padding:6px;align-items:flex-start;}
+.dialog-icon{font-size:28px;}
+.dialog-text{font-size:12px;line-height:1.5;}
+.dialog-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;}
+
+/* ---------- WINDOW RESIZING ---------- */
+.win-resize-handle {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 10px;
+  height: 10px;
+  cursor: se-resize;
+  z-index: 100;
+  background-image: linear-gradient(135deg, transparent 30%, var(--shadow) 30%, var(--shadow) 40%, transparent 40%, transparent 60%, var(--shadow) 60%, var(--shadow) 70%, transparent 70%);
+  background-size: 4px 4px;
+}

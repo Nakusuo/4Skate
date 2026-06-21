@@ -639,7 +639,7 @@ const DESKTOP_ITEMS = [
     text: 'Glenn,\n\nsi estás leyendo esto es porque encontraste esta compu vieja en el internet (es broma, te la mandé yo, pero finjamos que la encontraste vagando por distintos link).\n\naquí adentro están guardados 4 meses. no sé bien cómo explicarlos sin que suene cursi, así que mejor los organicé en carpetas, como si fueran archivos importantes. porque lo son, para mi.\n\nempieza por 4_meses. ve abriendo todo, no hay apuro, no hay orden correcto. al final hay algo, pero no te adelantes.\n\nfeliz geiversario, supongo.\n(sigue sonando raro decirlo así pero ya qué).\n\n— yo'
   }),
 
-  it({ name: 'top_brainrot.exe', type: 'exe', desktop: true }),
+  it({ name: 'bolita_rosa.exe', type: 'exe', desktop: true }),
   it({ name: 'Mi PC', type: 'special', special: 'mypc', desktop: true }),
   it({ name: 'Papelera de reciclaje', type: 'special', special: 'trash', desktop: true }),
   it({ name: 'CD Player (Música)', type: 'special', special: 'ytplayer', desktop: true }),

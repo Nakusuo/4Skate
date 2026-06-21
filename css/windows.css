@@ -61,3 +61,29 @@
   background-image: linear-gradient(135deg, transparent 30%, var(--shadow) 30%, var(--shadow) 40%, transparent 40%, transparent 60%, var(--shadow) 60%, var(--shadow) 70%, transparent 70%);
   background-size: 4px 4px;
 }
+
+@media (max-width: 600px) {
+  .window {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 94vw !important;
+    max-width: 440px !important;
+    max-height: calc(100vh - 54px) !important;
+    top: 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .taskbar-app {
+    min-width: 34px !important;
+    max-width: 60px !important;
+    padding: 0 4px !important;
+    justify-content: center;
+  }
+  .taskbar-app span:nth-child(2) {
+    display: none !important;
+  }
+  #systray {
+    padding: 0 6px !important;
+  }
+}

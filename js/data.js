@@ -423,39 +423,39 @@ const F01 = it({
   type: 'folder',
   emoji: '🎬',
   children: [
-    /* ✍️ [MODIFICA AQUÍ] Puedes agregar tu propia foto real cambiando 'illo' a 'image' y asignando un 'src' */
     it({
-      name: 'cine.png',
-      type: 'illo',
-      illo: 'cine',
+      name: 'cine.jpg',
+      type: 'image',
+      src: 'Imagenes/Tarde.jpg',
       caption: 'Llegué tarde al cine esa vez, tú estabas ahí esperando con tu cospobre de Clancy. Lol, creo que ni nos saludamos.'
     }),
 
     it({
-      name: 'ticket.png',
-      type: 'illo',
-      illo: 'ticket',
+      name: 'ticket.jpg',
+      type: 'image',
+      src: 'Imagenes/Entrada.jpg',
       caption: 'Hora: 18:00, Sala: 4, Asientos: G9-G10. Sigo guardando la captura.'
     }),
 
     it({
-      name: 'ella_esperando.png',
-      type: 'illo',
-      illo: 'esperando',
+      name: 'ella_esperando.jpg',
+      type: 'image',
+      src: 'Imagenes/Esperando.jpg',
       caption: 'tú ya estabas ahí.'
     }),
 
     it({
-      name: 'us.png',
-      type: 'illo',
-      illo: 'tarde',
+      name: 'us.jpg',
+      type: 'image',
+      src: 'Imagenes/us.jpg',
       caption: 'Sigo considerándolo de mis mejores días.'
     }),
 
     it({
       name: 'nota1.txt',
       type: 'note-hand',
-      text: 'recuerdo n.º 1:\nNo imaginaba lo importante que se volvería para mí ese momento.'
+      text: 'recuerdo n.º 1:\nNo imaginaba lo importante que se volvería para mí ese momento.',
+      src: 'Imagenes/Mi mejor dia.jpg'
     }),
   ]
 });

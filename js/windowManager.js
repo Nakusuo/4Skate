@@ -114,14 +114,37 @@ function createWindow({ id, title, icon, width, height, bodyHTML, path, statusTe
     bringToFront(id);
     return w;
   }
-  const pos = nextPos();
+  
+  const screenW = window.innerWidth;
+  const screenH = window.innerHeight;
+  const isMobile = screenW < 600;
+  
+  let targetWidth = width || 320;
+  if (isMobile) {
+    targetWidth = Math.min(screenW - 12, targetWidth);
+  }
+  
+  let targetHeight = height;
+  if (isMobile && height) {
+    targetHeight = Math.min(screenH - 80, targetHeight);
+  }
+  
+  let pos = nextPos();
+  if (isMobile) {
+    const count = Object.keys(openWindows).length;
+    pos = {
+      x: 6 + (count * 8) % 30,
+      y: 6 + (count * 8) % 50
+    };
+  }
+  
   const win = document.createElement('div');
   win.className = 'window';
-  win.style.width = (width || 320) + 'px';
+  win.style.width = targetWidth + 'px';
   win.style.left = pos.x + 'px';
   win.style.top = pos.y + 'px';
   win.style.zIndex = ++zTop;
-  if (height) win.style.height = height + 'px';
+  if (targetHeight) win.style.height = targetHeight + 'px';
   
   win.innerHTML = `
     <div class="titlebar">
@@ -279,8 +302,6 @@ function pathFor(item) {
 }
 
 function openFolderWindow(item) {
-  const grid = document.createElement('div');
-  grid.className = 'icon-grid';
   const win = createWindow({
     id: item.id, 
     title: item.name, 
@@ -291,7 +312,12 @@ function openFolderWindow(item) {
     path: pathFor(item),
     statusText: `${item.children.length} objeto(s)`
   });
+
   const body = win.el.querySelector('.window-body');
+  body.innerHTML = ''; // Clear to prevent duplicated icons under all conditions
+
+  const grid = document.createElement('div');
+  grid.className = 'icon-grid';
   body.appendChild(grid);
   item.children.forEach(child => grid.appendChild(makeIconEl(child)));
 }
@@ -303,6 +329,12 @@ function escapeHTML(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').r
 
 function openNoteHandWindow(item) {
   const isFinal = item.special === 'final';
+  let imgHTML = '';
+  if (item.src) {
+    imgHTML = `<div style="text-align:center;margin-top:12px;">
+      <img src="${item.src}" style="max-width:100%;height:auto;border:1px solid var(--ink);box-shadow:inset 1px 1px 0 #fff;background:#fff;" />
+    </div>`;
+  }
   createWindow({
     id: item.id, 
     title: item.name, 
@@ -311,6 +343,7 @@ function openNoteHandWindow(item) {
     bodyHTML: `<div class="note-hand" style="${isFinal ? 'font-size:23px;' : ''}">
       <span class="sticker" style="top:6px;right:10px;">${isFinal ? '💌' : '🩷'}</span>
       ${noteWrap(item.text)}
+      ${imgHTML}
     </div>`,
     statusText: 'bloc de notas'
   });

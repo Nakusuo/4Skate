@@ -56,14 +56,6 @@
 */
 
 const BG_MUSIC_SRC = 'musica/cancion.mp3';
-const MUSIC_YT_URL = 'https://www.youtube.com/watch?v=x6yZuUdvItI';
-
-function getYoutubeId(url) {
-  if (!url) return '';
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  const match = url.match(regExp);
-  return (match && match[2].length === 11) ? match[2] : '';
-}
 
 /* ================= 1. ICONOS PIXEL-ART (SVG) ================= */
 function pix(rows, map, cell = 1) {

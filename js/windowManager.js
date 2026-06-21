@@ -511,52 +511,40 @@ function openYtPlayerWindow(item) {
       </div>
       
       <div style="display:flex;gap:6px;margin-top:4px;width:100%;">
-        <button class="pixel-btn" id="yt-play" style="flex:1;font-weight:bold;height:24px;">Play ▶</button>
-        <button class="pixel-btn" id="yt-pause" style="flex:1;font-weight:bold;height:24px;">Pause ⏸</button>
-        <button class="pixel-btn" id="yt-stop" style="flex:1;font-weight:bold;height:24px;">Stop ■</button>
+        <button class="pixel-btn" id="cd-play" style="flex:1;font-weight:bold;height:24px;">Play ▶</button>
+        <button class="pixel-btn" id="cd-pause" style="flex:1;font-weight:bold;height:24px;">Pause ⏸</button>
+        <button class="pixel-btn" id="cd-stop" style="flex:1;font-weight:bold;height:24px;">Stop ■</button>
       </div>
     </div>`,
     statusText: 'reproductor de cd',
     onMount: (win) => {
       const audio = window.bgAudioPlayer;
-      const iframe = document.getElementById('bg-player-iframe');
       const statusText = win.querySelector('#cd-status');
       
       if (statusText) {
         statusText.textContent = window.bgPlayerStarted ? 'PLAYING' : 'READY';
       }
 
-      win.querySelector('#yt-play').addEventListener('click', () => {
+      win.querySelector('#cd-play').addEventListener('click', () => {
         SND.click();
         if (audio) {
           audio.play().catch(e => console.error("Error reproduciendo audio:", e));
           window.bgPlayerStarted = true;
           if (statusText) statusText.textContent = 'PLAYING';
-        } else if (iframe && iframe.contentWindow) {
-          iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-          window.bgPlayerStarted = true;
-          if (statusText) statusText.textContent = 'PLAYING';
         }
       });
-      win.querySelector('#yt-pause').addEventListener('click', () => {
+      win.querySelector('#cd-pause').addEventListener('click', () => {
         SND.click();
         if (audio) {
           audio.pause();
           if (statusText) statusText.textContent = 'PAUSED';
-        } else if (iframe && iframe.contentWindow) {
-          iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-          if (statusText) statusText.textContent = 'PAUSED';
         }
       });
-      win.querySelector('#yt-stop').addEventListener('click', () => {
+      win.querySelector('#cd-stop').addEventListener('click', () => {
         SND.click();
         if (audio) {
           audio.pause();
           audio.currentTime = 0;
-          window.bgPlayerStarted = false;
-          if (statusText) statusText.textContent = 'STOPPED';
-        } else if (iframe && iframe.contentWindow) {
-          iframe.contentWindow.postMessage('{"event":"command","func":"stopVideo","args":""}', '*');
           window.bgPlayerStarted = false;
           if (statusText) statusText.textContent = 'STOPPED';
         }

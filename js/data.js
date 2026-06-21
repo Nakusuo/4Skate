@@ -55,7 +55,7 @@
 =============================================================================
 */
 
-const BG_MUSIC_SRC = 'musica/Tv girl.mp3';
+const BG_MUSIC_SRC = 'musica/Tv_girl.mp3';
 
 /* ================= 1. ICONOS PIXEL-ART (SVG) ================= */
 function pix(rows, map, cell = 1) {
@@ -455,7 +455,7 @@ const F01 = it({
       name: 'nota1.txt',
       type: 'note-hand',
       text: 'recuerdo n.º 1:\nNo imaginaba lo importante que se volvería para mí ese momento.',
-      src: 'Imagenes/Mi mejor dia.jpg'
+      src: 'Imagenes/Mi_mejor_dia.jpg'
     }),
   ]
 });
@@ -477,7 +477,7 @@ const F02 = it({
       name: 'nota.txt',
       type: 'note-hand',
       text: '¿Puedo considerar esto algo especial?',
-      src: 'Imagenes/nota02despúes.png'
+      src: 'Imagenes/nota02despues.png'
     }),
   ]
 });

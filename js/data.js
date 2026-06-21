@@ -55,7 +55,7 @@
 =============================================================================
 */
 
-const BG_MUSIC_SRC = 'musica/cancion.mp3';
+const BG_MUSIC_SRC = 'musica/Tv girl.mp3';
 
 /* ================= 1. ICONOS PIXEL-ART (SVG) ================= */
 function pix(rows, map, cell = 1) {

@@ -500,7 +500,7 @@ function openYtPlayerWindow(item) {
     title: 'CD Player (Música)',
     icon: '🎵',
     width: 320,
-    height: 165,
+    height: 190,
     bodyHTML: `<div class="player" style="gap:6px;padding:6px 10px;">
       <div class="player-title" style="font-size:12px;align-self:flex-start;font-weight:bold;">CD Player</div>
       <div class="player-artist" style="font-size:11px;align-self:flex-start;color:var(--shadow);margin-bottom:2px;">Música de Fondo</div>
@@ -508,6 +508,12 @@ function openYtPlayerWindow(item) {
       <div style="background:#000;color:#00ff00;font-family:monospace;padding:6px 10px;width:100%;box-sizing:border-box;border:2px solid var(--shadow);display:flex;justify-content:space-between;align-items:center;font-size:13px;border-radius:2px;box-shadow:inset 1px 1px 0 rgba(0,0,0,.5);">
         <div>[TRACK 01]</div>
         <div id="cd-status">PLAYING</div>
+      </div>
+      
+      <!-- Control de Volumen -->
+      <div style="display:flex;align-items:center;gap:8px;width:100%;font-size:11px;margin:4px 0;color:var(--shadow);">
+        <span>Volumen:</span>
+        <input type="range" id="cd-volume" min="0" max="1" step="0.05" value="0.7" style="flex:1;cursor:pointer;">
       </div>
       
       <div style="display:flex;gap:6px;margin-top:4px;width:100%;">
@@ -520,9 +526,28 @@ function openYtPlayerWindow(item) {
     onMount: (win) => {
       const audio = window.bgAudioPlayer;
       const statusText = win.querySelector('#cd-status');
+      const volumeSlider = win.querySelector('#cd-volume');
       
       if (statusText) {
         statusText.textContent = window.bgPlayerStarted ? 'PLAYING' : 'READY';
+      }
+      
+      if (audio) {
+        if (!audio.volumeSet) {
+          audio.volume = 0.7;
+          audio.volumeSet = true;
+        }
+        if (volumeSlider) {
+          volumeSlider.value = audio.volume;
+        }
+      }
+
+      if (volumeSlider) {
+        volumeSlider.addEventListener('input', (e) => {
+          if (audio) {
+            audio.volume = e.target.value;
+          }
+        });
       }
 
       win.querySelector('#cd-play').addEventListener('click', () => {

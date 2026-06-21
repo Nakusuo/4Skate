@@ -256,7 +256,7 @@ ${[60, 90, 120, 150, 180, 210, 240].map(x => `<circle cx="${x}" cy="54" r="3" fi
 <circle cx="178" cy="150" r="2.4" fill="#4A3550"/>
 <rect x="60" y="70" width="48" height="64" fill="#fff" stroke="#4A3550" stroke-width="2.5" transform="rotate(-4 84 102)"/>
 <text x="84" y="106" text-anchor="middle" font-family="Caveat,cursive" font-size="13" fill="#B79AD6" transform="rotate(-4 84 102)">TOP</text>
-<text x="84" y="120" text-anchor="middle" font-family="Caveat,cursive" font-size="10" fill="#B79AD6" transform="rotate(-4 84 102)">documental</text>
+<text x="84" y="120" text-anchor="middle" font-family="Caveat,cursive" font-size="10" fill="#B79AD6" transform="rotate(-4 84 102)">more than we ever imagined</text>
 ${pixStarSmall(232, 82)} ${pixStarSmall(252, 150)} ${pixHeartSmall(40, 150)}
 `);
 
@@ -428,42 +428,41 @@ const F01 = it({
       name: 'cine.png',
       type: 'illo',
       illo: 'cine',
-      caption: 'el cine, esa tarde. con sus stickers de TOP pegados donde sea.'
+      caption: 'Llegué tarde al cine esa vez, tú estabas ahí esperando con tu cospobre de Clancy. Lol, creo que ni nos saludamos.'
     }),
 
     it({
       name: 'ticket.png',
       type: 'illo',
       illo: 'ticket',
-      caption: 'fila 4, butaca 6. lo guardé sin saber que lo iba a necesitar después.'
+      caption: 'Hora: 18:00, Sala: 4, Asientos: G9-G10. Sigo guardando la captura.'
     }),
 
     it({
       name: 'ella_esperando.png',
       type: 'illo',
       illo: 'esperando',
-      caption: 'tú ya estabas ahí. como siempre, antes que todos.'
+      caption: 'tú ya estabas ahí.'
     }),
 
     it({
-      name: 'yo_llegando_tarde.png',
+      name: 'us.png',
       type: 'illo',
       illo: 'tarde',
-      caption: 'y yo llegando tarde. eso también, como siempre.'
+      caption: 'Sigo considerándolo de mis mejores días.'
     }),
 
-    /* ✍️ [MODIFICA AQUÍ] Texto de la nota manuscrita */
     it({
       name: 'nota1.txt',
       type: 'note-hand',
-      text: 'recuerdo n.º 1:\nno sabía que ese día iba a importar tanto después.'
+      text: 'recuerdo n.º 1:\nNo imaginaba lo importante que se volvería para mí ese momento.'
     }),
   ]
 });
 
-// 📁 Carpeta 2
+// Carpeta 2
 const F02 = it({
-  name: '02_despues_del_docu',
+  name: '02_despues',
   type: 'folder',
   emoji: '💬',
   children: [
@@ -471,14 +470,13 @@ const F02 = it({
       name: 'chat_resumen.png',
       type: 'illo',
       illo: 'chat',
-      caption: 'versión resumida e ilustrada de como diez conversaciones distintas.'
+      caption: 'Por primera vez tenía más de 3 mensajes de un mismo chat en mi vida.'
     }),
 
-    /* ✍️ [MODIFICA AQUÍ] Texto manuscrito */
     it({
       name: 'nota.txt',
       type: 'note-hand',
-      text: 'ok, creo que ahora sí somos amigas.'
+      text: '¿Puedo considerar esto algo especial?'
     }),
   ]
 });
@@ -491,33 +489,31 @@ const F03 = it({
   children: [
     /* ✍️ [MODIFICA AQUÍ] Si deseas subir un mp3 real, agrégale: src: 'musica/cancion.mp3' */
     it({
-      name: 'canción_devastadora.mp3',
+      name: 'Tu_musica.mp3',
       type: 'audio',
-      title: 'canción_devastadora.mp3',
+      title: 'canciones_fav.mp3',
       artist: '[clasificado]',
-      caption: 'no puedo poner la letra aquí por derechos de autor. pero tú ya sabes cuál es.'
+      caption: 'no puedo poner todas aquí, tienes como un millón de favoritas.'
     }),
 
     it({
-      name: 'tweet_indirecta.png',
+      name: 'tweets.png',
       type: 'illo',
       illo: 'tweet',
-      caption: 'una indirecta de las tuyas, archivada para la posteridad.'
+      caption: 'Casi todo sobre Top y Tyler lol.'
     }),
 
-    /* ✍️ [MODIFICA AQUÍ] Si deseas subir un mp4 real, agrégale: src: 'videos/gracioso.mp4' */
     it({
       name: 'video_random.mp4',
       type: 'video',
       title: 'video_random.mp4',
-      caption: 'formato no compatible con esta compu. (típico).'
+      caption: 'Espero que sí te cargue.'
     }),
 
-    /* ✍️ [MODIFICA AQUÍ] Textos clasificados */
     it({
       name: 'referencias_internas.txt',
       type: 'note-mono',
-      text: 'cosas que solo nosotras entendemos:\n\n- el asado que nunca llegó\n- el ranking oficial de brainrot (clasificado)\n- los audífonos para llorar en el cine\n- [contenido clasificado nivel 3]'
+      text: 'cosas que solo nosotras entendemos:\n\n- Joshler more than we ever imagined\n- bolitas de colores\n- que somos Ty y Josh\n- [contenido clasificado nivel 3]'
     }),
   ]
 });
@@ -532,21 +528,20 @@ const F04 = it({
       name: 'metro_nocturno.png',
       type: 'illo',
       illo: 'metro',
-      caption: 'el regreso de siempre. ventana, luces de la ciudad, nosotras hablando de todo.'
+      caption: 'No hablamos, pero sentía que nuestro interior sí.'
     }),
 
     it({
-      name: 'nosotras_caricatura.png',
+      name: 'nosotras_again.png',
       type: 'illo',
       illo: 'chibis',
-      caption: 'versión caricaturizada oficial de nosotras dos.'
+      caption: 'Dibujo todo feo para recordarlo.'
     }),
 
-    /* ✍️ [MODIFICA AQUÍ] Texto de la nota */
     it({
       name: 'nota.txt',
       type: 'note-hand',
-      text: 'ese bus siempre se demoraba. no importaba, hablábamos de todo de todos modos.'
+      text: 'Terminé llegando más tarde de lo que esperé, no importaba. Había pasado el día contigo.'
     }),
   ]
 });
@@ -561,14 +556,13 @@ const F05 = it({
       name: 'sketchbook.png',
       type: 'illo',
       illo: 'sketchbook',
-      caption: 'mi primer sketchbook. todavía lo tengo.'
+      caption: 'Mi primer sketchbook. No sabes cuánto lo adoro.'
     }),
 
-    /* ✍️ [MODIFICA AQUÍ] Texto del sketchbook */
     it({
       name: 'nota_sketchbook.txt',
       type: 'note-hand',
-      text: 'Mi primer sketchbook. Lo miré durante varios minutos cuando llegué a casa. Y sí, lloré un poquito.'
+      text: 'Como sabes, eres la primera persona que me regala un sketch. Lo miré durante varios minutos cuando llegué a casa. No podía creer que fueras tan atenta. Y sí, lloré demasiado.'
     }),
   ]
 });
@@ -584,20 +578,19 @@ const F06 = it({
       name: 'collage.png',
       type: 'illo',
       illo: 'collage',
-      caption: 'todo junto. el cine, el bus, el sketchbook, las estrellitas.'
+      caption: 'Aunque mis memorias siempre son borrosas por mis problemas mentales, las tuyas siguen intactas.'
     }),
 
-    /* ✍️ [MODIFICA AQUÍ] Textos y notas de cierre */
     it({
       name: 'referencias.txt',
       type: 'note-mono',
-      text: 'cosas que ya son nuestras:\n\n- el cine\n- el bus que se demoraba\n- el sketchbook\n- el asado pendiente\n- el ranking de brainrot\n- esto, lo que sea que esto es'
+      text: 'cosas que ya son nuestras:\n\n- el cine\n- regresar en el metro\n- odiar a la ATU\n- el holder que me debes\n- tu playlist toda gay\n- esto, lo que sea que esto es'
     }),
 
     it({
       name: 'frase.txt',
       type: 'note-hand',
-      text: 'qué raro que termináramos siendo tan importantes la una para la otra.'
+      text: 'Qué raro que termináramos siendo tan importantes la una para la otra.'
     }),
 
     it({

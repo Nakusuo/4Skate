@@ -467,16 +467,17 @@ const F02 = it({
   emoji: '💬',
   children: [
     it({
-      name: 'chat_resumen.png',
-      type: 'illo',
-      illo: 'chat',
+      name: 'chat_resumen.jpg',
+      type: 'image',
+      src: 'Imagenes/Chat.jpg',
       caption: 'Por primera vez tenía más de 3 mensajes de un mismo chat en mi vida.'
     }),
 
     it({
       name: 'nota.txt',
       type: 'note-hand',
-      text: '¿Puedo considerar esto algo especial?'
+      text: '¿Puedo considerar esto algo especial?',
+      src: 'Imagenes/nota02despúes.png'
     }),
   ]
 });
@@ -498,8 +499,8 @@ const F03 = it({
 
     it({
       name: 'tweets.png',
-      type: 'illo',
-      illo: 'tweet',
+      type: 'image',
+      src: 'Imagenes/tweet.png',
       caption: 'Casi todo sobre Top y Tyler lol.'
     }),
 
@@ -507,13 +508,15 @@ const F03 = it({
       name: 'video_random.mp4',
       type: 'video',
       title: 'video_random.mp4',
-      caption: 'Espero que sí te cargue.'
+      src: 'Imagenes/videorandom.mp4',
+      caption: 'Yo creo que hacer esto es lo que nos sentenció.\nEspero que sí te cargue.'
     }),
 
     it({
-      name: 'referencias_internas.txt',
-      type: 'note-mono',
-      text: 'cosas que solo nosotras entendemos:\n\n- Joshler more than we ever imagined\n- bolitas de colores\n- que somos Ty y Josh\n- [contenido clasificado nivel 3]'
+      name: 'referencias_internas.jpg',
+      type: 'image',
+      src: 'Imagenes/referencias.internas.jpg',
+      caption: 'cosas que solo nosotras entendemos:\n\n- Joshler more than we ever imagined\n- bolitas de colores\n- que somos Ty y Josh\n- [contenido clasificado nivel 3]'
     }),
   ]
 });
@@ -532,10 +535,10 @@ const F04 = it({
     }),
 
     it({
-      name: 'nosotras_again.png',
-      type: 'illo',
-      illo: 'chibis',
-      caption: 'Dibujo todo feo para recordarlo.'
+      name: 'nosotras_again.jpg',
+      type: 'image',
+      src: 'Imagenes/metrojuntas.jpg',
+      caption: 'Creo que es la mejor foto (por no decir la única) que nos tomamos juntas.'
     }),
 
     it({
@@ -553,9 +556,9 @@ const F05 = it({
   emoji: '📓',
   children: [
     it({
-      name: 'sketchbook.png',
-      type: 'illo',
-      illo: 'sketchbook',
+      name: 'sketchbook.jpg',
+      type: 'image',
+      src: 'Imagenes/sketch.jpg',
       caption: 'Mi primer sketchbook. No sabes cuánto lo adoro.'
     }),
 
@@ -576,8 +579,8 @@ const F06 = it({
   children: [
     it({
       name: 'collage.png',
-      type: 'illo',
-      illo: 'collage',
+      type: 'image',
+      src: 'Imagenes/collage.png',
       caption: 'Aunque mis memorias siempre son borrosas por mis problemas mentales, las tuyas siguen intactas.'
     }),
 
@@ -597,7 +600,7 @@ const F06 = it({
       name: 'ultima_nota.txt',
       type: 'note-hand',
       special: 'final',
-      text: 'no esperaba que una ida al cine terminara convirtiéndose en una de mis amistades favoritas.\n\nfeliz geiversario, Glenn.\n\n— yo'
+      text: 'Han pasado 4 meses desde que fuimos al cine.Sigo pensando que fue una de las mejores casualidades de mi vida.\n\nfeliz geiversario, Glenn.\n\n— yo'
     }),
   ]
 });
@@ -610,23 +613,16 @@ const F_4MESES = it({
   children: [
     F01, F02, F03, F04, F05, F06,
 
-    /* ✍️ [MODIFICA AQUÍ] Cronología de lore */
-    it({
-      name: 'lore.txt',
-      type: 'note-mono',
-      text: 'lore.txt\n\ncronología no oficial (sujeta a revisión,\nautora poco objetiva):\n\ndía 1: cine. ella tarde. yo... también tarde, pero menos.\nsemana 2: empezamos a hablar todos los días sin darnos cuenta.\nmes 2: ya teníamos memes inside que nadie más entendía.\nmes 3: sketchbook.\nmes 4: esto. literalmente esto, esta página.\n\nfin de la cronología (por ahora).'
-    }),
-
     it({
       name: 'cosas_que_nunca_superamos.doc',
       type: 'note-mono',
-      text: 'cosas_que_nunca_superamos.doc\n\n- el asado que prometiste y nunca llegó\n- esa canción que nos rompió por dos semanas\n- el chiste de la fila 4, butaca 6\n- que siempre llega una tarde y la otra más tarde'
+      text: 'cosas_que_nunca_superamos.doc\n\n- JOSHLER FICS\n- cualquier momento gay'
     }),
 
     it({
       name: 'definitivamente_normales.txt',
       type: 'note-mono',
-      text: 'definitivamente_normales.txt\n\ncosas 100% normales que hacemos:\n\n- mandar memes a las 3am como si fuera trabajo urgente\n- tener un ranking oficial de brainrot\n- llorar (un poquito) por un sketchbook\n- escribirle cartas a través de una compu falsa de los 90\n\nsí. muy normales. 0 dudas.'
+      text: 'definitivamente_normales.txt\n\ncosas 100% normales que hacemos:\n\n- discutir algo nada que ver a las 2am\n- tener una lista de fics por leer\n- escribirnos cosas muy sentimentales\n\nsí. muy normales. 0 dudas.'
     }),
   ]
 });
@@ -640,7 +636,7 @@ const DESKTOP_ITEMS = [
     name: 'geiversario_notes.txt',
     type: 'note-hand',
     desktop: true,
-    text: 'Glenn,\n\nsi estás leyendo esto es porque encontraste esta compu vieja (es broma, te la mandé yo, pero finjamos que la encontraste guardada en un cajón después de años).\n\naquí adentro están guardados 4 meses. no sé bien cómo explicarlos sin que suene cursi, así que mejor los organicé en carpetas, como si fueran archivos importantes. porque lo son.\n\nempieza por 4_meses. ve abriendo todo, no hay apuro, no hay orden correcto. al final hay algo, pero no te adelantes.\n\nfeliz geiversario, supongo.\n(sigue sonando raro decirlo así pero ya qué).\n\n— yo'
+    text: 'Glenn,\n\nsi estás leyendo esto es porque encontraste esta compu vieja en el internet (es broma, te la mandé yo, pero finjamos que la encontraste vagando por distintos link).\n\naquí adentro están guardados 4 meses. no sé bien cómo explicarlos sin que suene cursi, así que mejor los organicé en carpetas, como si fueran archivos importantes. porque lo son, para mi.\n\nempieza por 4_meses. ve abriendo todo, no hay apuro, no hay orden correcto. al final hay algo, pero no te adelantes.\n\nfeliz geiversario, supongo.\n(sigue sonando raro decirlo así pero ya qué).\n\n— yo'
   }),
 
   it({ name: 'top_brainrot.exe', type: 'exe', desktop: true }),
@@ -663,6 +659,6 @@ const MENU_ITEMS = [
 const BOOT_LINES = [
   'detectando recuerdos.......... OK',
   'montando unidad C:\\4_meses .... OK',
-  'cargando corazones pixelados .. OK',
+  'cargando sentimientos .. OK',
   'iniciando WinGei 98 ...........'
 ];

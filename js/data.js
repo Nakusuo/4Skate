@@ -55,10 +55,7 @@
 =============================================================================
 */
 
-// ✍️ [MODIFICA AQUÍ] Ruta del archivo MP3 local o enlace de YouTube de fondo.
-// Se recomienda usar un archivo MP3 local (ej: 'musica/cancion.mp3') para evitar anuncios.
-// Si dejas BG_MUSIC_SRC vacío (ej: ''), se cargará el vídeo de YouTube configurado abajo.
-const BG_MUSIC_SRC = 'musica/cancion.mp3'; 
+const BG_MUSIC_SRC = 'musica/cancion.mp3';
 const MUSIC_YT_URL = 'https://www.youtube.com/watch?v=x6yZuUdvItI';
 
 function getYoutubeId(url) {

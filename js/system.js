@@ -157,7 +157,6 @@ function runBoot() {
 
 window.bgPlayerStarted = false;
 window.bgAudioPlayer = null;
-let bgPlayerIframe = null;
 
 function initBgPlayer() {
   if (typeof BG_MUSIC_SRC !== 'undefined' && BG_MUSIC_SRC) {
@@ -179,40 +178,7 @@ function initBgPlayer() {
     
     document.addEventListener('pointerdown', startPlay);
     document.addEventListener('click', startPlay);
-    return;
   }
-
-  const videoId = getYoutubeId(MUSIC_YT_URL);
-  if (!videoId) return;
-  
-  bgPlayerIframe = document.createElement('iframe');
-  bgPlayerIframe.id = 'bg-player-iframe';
-  bgPlayerIframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&loop=1&playlist=${videoId}`;
-  bgPlayerIframe.style.position = 'absolute';
-  bgPlayerIframe.style.width = '1px';
-  bgPlayerIframe.style.height = '1px';
-  bgPlayerIframe.style.left = '-9999px';
-  bgPlayerIframe.style.opacity = '0';
-  bgPlayerIframe.style.pointerEvents = 'none';
-  bgPlayerIframe.setAttribute('allow', 'autoplay; encrypted-media');
-  bgPlayerIframe.setAttribute('frameborder', '0');
-  document.body.appendChild(bgPlayerIframe);
-
-  const startPlay = () => {
-    if (window.bgPlayerStarted) return;
-    window.bgPlayerStarted = true;
-    if (bgPlayerIframe && bgPlayerIframe.contentWindow) {
-      bgPlayerIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-    }
-    const statusText = document.getElementById('cd-status');
-    if (statusText) statusText.textContent = 'PLAYING';
-    
-    document.removeEventListener('pointerdown', startPlay);
-    document.removeEventListener('click', startPlay);
-  };
-  
-  document.addEventListener('pointerdown', startPlay);
-  document.addEventListener('click', startPlay);
 }
 
 function init() {

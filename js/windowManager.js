@@ -478,22 +478,36 @@ function openDialog({ title, icon, text, buttons }) {
 
 function openExeDialog(item) {
   openDialog({
-    title: 'top_brainrot.exe', 
-    icon: '⚠️',
-    text: 'este archivo contiene niveles críticos de brainrot.<br>¿deseas continuar?',
+    title: 'bolita rosa.exe', 
+    icon: '📁',
+    text: '¿Deseas eliminar "bolita rosa.exe"?',
     buttons: [
       { 
         label: 'Sí', 
         onClick: () => {
-          SND.success();
-          openNoteMonoWindow({ 
-            id: 'ranking-oficial', 
-            name: 'ranking_oficial.txt', 
-            text: 'ranking oficial de brainrot (clasificado):\n\n1. [redactado]\n2. [redactado]\n3. el asado pendiente (técnicamente no es brainrot pero igual entra)\n\ngracias por tu cooperación.' 
+          SND.error();
+          openDialog({
+            title: 'Error',
+            icon: '❌',
+            text: '<strong>Desinstalación fallida.</strong><br><br>"bolita rosa.exe" no puede ser eliminado.<br><br>Motivo:<br>Marcó mi vida demasiado profundo como para enviarlo a la papelera.<br><br>El sistema recomienda conservar este archivo para siempre.',
+            buttons: [
+              {
+                label: 'Entendido',
+                onClick: () => {
+                  SND.click();
+                }
+              }
+            ]
           });
         } 
       },
-      { label: 'No', onClick: () => { showToast('decisión sabia.'); } }
+      { 
+        label: 'No', 
+        onClick: () => { 
+          SND.click();
+          showToast('Decisión sabia. Bolita rosa se queda.'); 
+        } 
+      }
     ]
   });
 }

@@ -518,6 +518,7 @@ function openYtPlayerWindow(item) {
     </div>`,
     statusText: 'reproductor de cd',
     onMount: (win) => {
+      const audio = window.bgAudioPlayer;
       const iframe = document.getElementById('bg-player-iframe');
       const statusText = win.querySelector('#cd-status');
       
@@ -527,7 +528,11 @@ function openYtPlayerWindow(item) {
 
       win.querySelector('#yt-play').addEventListener('click', () => {
         SND.click();
-        if (iframe && iframe.contentWindow) {
+        if (audio) {
+          audio.play().catch(e => console.error("Error reproduciendo audio:", e));
+          window.bgPlayerStarted = true;
+          if (statusText) statusText.textContent = 'PLAYING';
+        } else if (iframe && iframe.contentWindow) {
           iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
           window.bgPlayerStarted = true;
           if (statusText) statusText.textContent = 'PLAYING';
@@ -535,14 +540,22 @@ function openYtPlayerWindow(item) {
       });
       win.querySelector('#yt-pause').addEventListener('click', () => {
         SND.click();
-        if (iframe && iframe.contentWindow) {
+        if (audio) {
+          audio.pause();
+          if (statusText) statusText.textContent = 'PAUSED';
+        } else if (iframe && iframe.contentWindow) {
           iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
           if (statusText) statusText.textContent = 'PAUSED';
         }
       });
       win.querySelector('#yt-stop').addEventListener('click', () => {
         SND.click();
-        if (iframe && iframe.contentWindow) {
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+          window.bgPlayerStarted = false;
+          if (statusText) statusText.textContent = 'STOPPED';
+        } else if (iframe && iframe.contentWindow) {
           iframe.contentWindow.postMessage('{"event":"command","func":"stopVideo","args":""}', '*');
           window.bgPlayerStarted = false;
           if (statusText) statusText.textContent = 'STOPPED';

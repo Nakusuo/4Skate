@@ -156,9 +156,32 @@ function runBoot() {
 }
 
 window.bgPlayerStarted = false;
+window.bgAudioPlayer = null;
 let bgPlayerIframe = null;
 
 function initBgPlayer() {
+  if (typeof BG_MUSIC_SRC !== 'undefined' && BG_MUSIC_SRC) {
+    window.bgAudioPlayer = new Audio(BG_MUSIC_SRC);
+    window.bgAudioPlayer.loop = true;
+    
+    const startPlay = () => {
+      if (window.bgPlayerStarted) return;
+      window.bgPlayerStarted = true;
+      window.bgAudioPlayer.play().catch(e => {
+        console.log("Autoplay bloqueado. Se reproducirá al interactuar:", e);
+      });
+      const statusText = document.getElementById('cd-status');
+      if (statusText) statusText.textContent = 'PLAYING';
+      
+      document.removeEventListener('pointerdown', startPlay);
+      document.removeEventListener('click', startPlay);
+    };
+    
+    document.addEventListener('pointerdown', startPlay);
+    document.addEventListener('click', startPlay);
+    return;
+  }
+
   const videoId = getYoutubeId(MUSIC_YT_URL);
   if (!videoId) return;
   

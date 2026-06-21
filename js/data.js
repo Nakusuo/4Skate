@@ -492,9 +492,11 @@ const F03 = it({
     it({
       name: 'Tu_musica.mp3',
       type: 'audio',
-      title: 'canciones_fav.mp3',
-      artist: '[clasificado]',
-      caption: 'no puedo poner todas aquí, tienes como un millón de favoritas.'
+      title: 'Harvey.mp3',
+      artist: "Her's",
+      src: 'musica/Harvey.mp3',
+      cover: 'Imagenes/mp3.jpg',
+      caption: 'Una de tus favoritas. 🎵'
     }),
 
     it({

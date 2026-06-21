@@ -398,6 +398,9 @@ function openPlayerWindow(item, kind) {
     </div>`;
   } else {
     playerBody = `<div class="player">
+      <div class="player-cover-container">
+        <img class="player-cover" id="cover-${item.id}" src="${item.cover || 'Imagenes/mp3.jpg'}" alt="Cover Art">
+      </div>
       <div class="player-title">${item.title}</div>
       ${item.artist ? `<div class="player-artist">${item.artist}</div>` : ''}
       <div class="play-btn" id="play-${item.id}">▶</div>
@@ -417,6 +420,8 @@ function openPlayerWindow(item, kind) {
       const playBtn = win.querySelector('#play-' + item.id);
       if (!playBtn) return; // El vídeo usa controles nativos
       
+      const coverImg = win.querySelector('#cover-' + item.id);
+      
       // Soporte para audio subido por el usuario
       if (item.src) {
         const audio = new Audio(item.src);
@@ -428,6 +433,7 @@ function openPlayerWindow(item, kind) {
             audio.pause();
             playBtn.textContent = '▶';
             playing = false;
+            if (coverImg) coverImg.classList.remove('playing');
           } else {
             audio.play().catch(e => {
               console.error("Error al reproducir audio:", e);
@@ -436,6 +442,7 @@ function openPlayerWindow(item, kind) {
             });
             playBtn.textContent = '⏸';
             playing = true;
+            if (coverImg) coverImg.classList.add('playing');
           }
         });
         
@@ -546,13 +553,15 @@ function openYtPlayerWindow(item) {
     id: item.id,
     title: 'CD Player (Música)',
     icon: '🎵',
-    width: 320,
-    height: 190,
-    bodyHTML: `<div class="player" style="gap:6px;padding:6px 10px;">
-      <div class="player-title" style="font-size:12px;align-self:flex-start;font-weight:bold;">CD Player</div>
-      <div class="player-artist" style="font-size:11px;align-self:flex-start;color:var(--shadow);margin-bottom:2px;">Música de Fondo</div>
+    width: 300,
+    bodyHTML: `<div class="player">
+      <div class="player-cover-container">
+        <img class="player-cover" id="cd-cover" src="Imagenes/mp3.jpg" alt="Cover Art">
+      </div>
+      <div class="player-title" style="margin:0;">CD Player</div>
+      <div class="player-artist" style="color:var(--shadow);margin-bottom:2px;">Música de Fondo</div>
       
-      <div style="background:#000;color:#00ff00;font-family:monospace;padding:6px 10px;width:100%;box-sizing:border-box;border:2px solid var(--shadow);display:flex;justify-content:space-between;align-items:center;font-size:13px;border-radius:2px;box-shadow:inset 1px 1px 0 rgba(0,0,0,.5);">
+      <div style="background:#000;color:#00ff00;font-family:monospace;padding:6px 10px;width:100%;box-sizing:border-box;border:2px solid var(--shadow);display:flex;justify-content:space-between;align-items:center;font-size:13px;border-radius:2px;box-shadow:inset 1px 1px 0 rgba(0,0,0,.5);margin-top:2px;">
         <div>[TRACK 01]</div>
         <div id="cd-status">PLAYING</div>
       </div>
@@ -574,9 +583,14 @@ function openYtPlayerWindow(item) {
       const audio = window.bgAudioPlayer;
       const statusText = win.querySelector('#cd-status');
       const volumeSlider = win.querySelector('#cd-volume');
+      const cdCover = win.querySelector('#cd-cover');
       
       if (statusText) {
         statusText.textContent = window.bgPlayerStarted ? 'PLAYING' : 'READY';
+      }
+      
+      if (cdCover && window.bgPlayerStarted) {
+        cdCover.classList.add('playing');
       }
       
       if (audio) {
@@ -603,6 +617,7 @@ function openYtPlayerWindow(item) {
           audio.play().catch(e => console.error("Error reproduciendo audio:", e));
           window.bgPlayerStarted = true;
           if (statusText) statusText.textContent = 'PLAYING';
+          if (cdCover) cdCover.classList.add('playing');
         }
       });
       win.querySelector('#cd-pause').addEventListener('click', () => {
@@ -610,6 +625,7 @@ function openYtPlayerWindow(item) {
         if (audio) {
           audio.pause();
           if (statusText) statusText.textContent = 'PAUSED';
+          if (cdCover) cdCover.classList.remove('playing');
         }
       });
       win.querySelector('#cd-stop').addEventListener('click', () => {
@@ -619,6 +635,7 @@ function openYtPlayerWindow(item) {
           audio.currentTime = 0;
           window.bgPlayerStarted = false;
           if (statusText) statusText.textContent = 'STOPPED';
+          if (cdCover) cdCover.classList.remove('playing');
         }
       });
     }

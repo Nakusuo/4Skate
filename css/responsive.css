@@ -1,0 +1,101 @@
+/* ================= ADAPTACION A PANTALLAS (responsive.css) =================
+   Todas las media queries del proyecto viven aqui, ordenadas de pantalla
+   grande a pequeña. Cargar SIEMPRE despues del resto de hojas.
+=========================================================================== */
+
+/* La barra del navegador movil cambia de alto: dvh evita el corte de abajo. */
+@supports (height:100dvh){
+  html,body{height:100dvh;}
+}
+
+/* ---------- TABLET ---------- */
+@media (max-width:860px){
+  :root{
+    --icon-w:72px;
+    --icon-glyph:36px;
+  }
+  .illo-caption{max-width:36ch;}
+}
+
+/* ---------- MOVIL ---------- */
+@media (max-width:600px){
+  :root{
+    --taskbar-h:40px;          /* mas alto = mas facil de tocar */
+    --icon-w:68px;
+    --icon-glyph:34px;
+  }
+
+  .desktop-icons{
+    inset:10px auto 10px 8px;
+    gap:4px 2px;
+  }
+  .icon .label{font-size:10px;}
+
+  /* Botones del sistema mas grandes para el dedo */
+  #start-btn{height:30px;padding:0 12px 0 8px;}
+  .taskbar-app{height:30px;flex:1 1 90px;}
+  #systray{height:28px;}
+
+  .titlebar{height:28px;}
+  .titlebar-btn{width:22px;height:20px;line-height:18px;font-size:11px;}
+
+  .window-body{padding:8px;}
+  .dialog-btns .pixel-btn{min-width:88px;padding:7px 14px;}
+
+  /* El menu de inicio ocupa el ancho comodo de la pantalla */
+  #start-menu{width:min(260px,calc(100vw - 8px));}
+  .menu-item{padding:9px 8px;}
+
+  .player-lcd{font-size:11px;padding:5px 8px;}
+  .player-transport .pixel-btn{min-height:32px;font-size:11px;}
+  .player-seek{height:16px;}
+  .player-caption,.illo-caption{max-width:100%;}
+}
+
+/* ---------- MOVIL ESTRECHO ---------- */
+@media (max-width:420px){
+  /* En la barra de tareas solo caben los iconos */
+  .taskbar-app{
+    flex:0 0 auto;
+    min-width:36px;
+    max-width:44px;
+    padding:0 6px;
+    justify-content:center;
+  }
+  .taskbar-app .tba-label{display:none;}
+  #start-btn .start-label{display:none;}
+  #start-btn{padding:0 10px;}
+  #systray{padding:0 6px;}
+
+  .icon-grid{grid-template-columns:repeat(auto-fill,minmax(64px,1fr));}
+  .note-hand{padding:10px 12px 12px;}
+}
+
+/* ---------- PANTALLAS BAJAS (movil en horizontal) ---------- */
+@media (max-height:480px){
+  #boot-screen{justify-content:flex-start;padding-top:16px;}
+  .player-cover-container{width:clamp(72px,18vh,96px);}
+  .waveform{height:22px;}
+}
+
+/* ---------- PUNTERO GRUESO (tactil) ---------- */
+@media (pointer:coarse){
+  .win-resize-handle{width:22px;height:22px;background-size:5px 5px;}
+  .icon{padding:6px 2px;}
+}
+
+/* ---------- MENOS MOVIMIENTO ---------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.001ms!important;
+  }
+  .player.is-playing .waveform span{transform:scaleY(.7);}
+}
+
+/* ---------- IMPRESION ---------- */
+@media print{
+  #taskbar,#start-menu,#boot-screen,#toast,.win-resize-handle{display:none!important;}
+  html,body{overflow:visible;height:auto;}
+}

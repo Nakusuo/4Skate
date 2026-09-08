@@ -1,643 +1,317 @@
-/* ================= RETRO WINDOW MANAGER (windowManager.js) ================= */
-// Este archivo maneja la creación de ventanas, arrastre, eventos y renderizado de contenidos.
+/* ================= WINDOW MANAGER (windowManager.js) =================
+   Solo el "chrome" de las ventanas: crear, enfocar, mover, redimensionar,
+   minimizar, maximizar, cerrar y la barra de tareas.
+   El contenido de cada ventana vive en apps.js.
+===================================================================== */
 
-let zTop = 10;
-let openWindows = {};
-let cascade = 0;
-let visited = new Set();
-const winLayer = document.getElementById('windows-layer');
-const taskbarApps = document.getElementById('taskbar-apps');
+const WM = (() => {
+  const MOBILE_BREAKPOINT = 600;
+  const TASKBAR_H = 34;
 
-function glyphHTML(item) {
-  if (item.type === 'folder') {
-    if (item.locked && !folderUnlocked()) return ICON_FOLDER_FADE;
-    if (item.locked) return ICON_FOLDER_LILAC;
-    return ICON_FOLDER;
-  }
-  if (item.special === 'mypc') return ICON_MYPC;
-  if (item.special === 'trash') return ICON_TRASH;
-  if (item.type === 'illo' || item.type === 'image') return ICON_IMAGE;
-  if (item.type === 'note-hand' || item.type === 'note-mono') return ICON_NOTE;
-  if (item.type === 'audio') return ICON_AUDIO;
-  if (item.type === 'video') return ICON_VIDEO;
-  if (item.type === 'exe') return ICON_EXE;
-  
-  return `<span>${item.emoji || '📄'}</span>`;
-}
+  let zTop = 10;
+  let cascade = 0;
+  let activeId = null;
 
-function folderUnlocked() { return visited.size >= 5; }
+  /** @type {Object<string,{el:HTMLElement,title:string,icon:string,minimized:boolean,maximized:boolean,onClose:Function|null,prevRect:Object|null}>} */
+  const windows = {};
 
-function makeIconEl(item) {
-  const div = document.createElement('div');
-  div.className = 'icon' + (item.locked && !folderUnlocked() ? ' locked' : '');
-  div.dataset.id = item.id;
-  div.innerHTML = `<div class="glyph">${glyphHTML(item)}${item.locked ? `<span class="badge">${folderUnlocked() ? '✨' : '🔒'}</span>` : ''}</div><div class="label">${item.name}</div>`;
-  let lastTap = 0;
-  div.addEventListener('pointerup', (e) => {
-    e.stopPropagation();
-    document.querySelectorAll('.icon.selected').forEach(i => { if (i !== div) i.classList.remove('selected'); });
-    div.classList.add('selected');
-    const now = Date.now();
-    if (now - lastTap < 450) { 
-      lastTap = 0; 
-      openItem(item); 
-    } else { 
-      lastTap = now; 
+  const layer = () => document.getElementById('windows-layer');
+  const tray = () => document.getElementById('taskbar-apps');
+
+  const isMobile = () => window.innerWidth < MOBILE_BREAKPOINT;
+
+  /* ---------- geometria ---------- */
+
+  function nextPos(w, h) {
+    const maxX = Math.max(8, window.innerWidth - w - 8);
+    const maxY = Math.max(8, window.innerHeight - TASKBAR_H - h - 8);
+    if (isMobile()) {
+      cascade = (cascade + 1) % 5;
+      return { x: Math.round((window.innerWidth - w) / 2), y: Math.min(8 + cascade * 14, maxY) };
     }
-  });
-  return div;
-}
-
-function renderDesktop() {
-  const cont = document.getElementById('desktop-icons');
-  if (!cont) return;
-  cont.innerHTML = '';
-  DESKTOP_ITEMS.forEach(it => cont.appendChild(makeIconEl(it)));
-}
-
-function openItem(item) {
-  if (item.type === 'folder' && item.locked && !folderUnlocked()) {
-    SND.error();
-    showToast('todavía falta explorar más recuerdos antes de esto 🔒');
-    return;
+    cascade = (cascade + 1) % 7;
+    return { x: Math.min(80 + cascade * 26, maxX), y: Math.min(40 + cascade * 22, maxY) };
   }
-  SND.click();
-  if (item.type === 'folder') {
-    SND.open();
-    const tracked = ['01_cine_top', '02_despues', '03_cosas_que_me_compartiste', '04_metro', '05_sketchbook'];
-    if (tracked.includes(item.name)) {
-      visited.add(item.name);
-      if (folderUnlocked()) unlockF06();
+
+  /** Mantiene la ventana dentro de la pantalla (al abrir y al rotar el movil). */
+  function clampIntoView(el) {
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    const maxX = Math.max(0, window.innerWidth - Math.min(w, 120));
+    const maxY = Math.max(0, window.innerHeight - TASKBAR_H - 24);
+    el.style.left = Math.max(0, Math.min(maxX, el.offsetLeft)) + 'px';
+    el.style.top = Math.max(0, Math.min(maxY, el.offsetTop)) + 'px';
+  }
+
+  /* ---------- ciclo de vida ---------- */
+
+  function create({ id, title, icon, width, height, bodyHTML, path, statusText, onMount, onClose, fitMobile = true }) {
+    const existing = windows[id];
+    if (existing) {
+      if (existing.minimized) restore(id);
+      else focus(id);
+      return existing;
     }
-    openFolderWindow(item);
-  } 
-  else if (item.type === 'illo' || item.type === 'image') { openIlloWindow(item); }
-  else if (item.type === 'note-hand') { openNoteHandWindow(item); }
-  else if (item.type === 'note-mono') { openNoteMonoWindow(item); }
-  else if (item.type === 'audio') { openPlayerWindow(item, 'audio'); }
-  else if (item.type === 'video') { openPlayerWindow(item, 'video'); }
-  else if (item.type === 'exe') { openExeDialog(item); }
-  else if (item.special) { openSpecialWindow(item); }
-}
 
-function unlockF06() {
-  const el = document.querySelector(`.icon[data-id="${F06.id}"]`);
-  if (el && el.classList.contains('locked')) {
-    el.classList.remove('locked');
-    el.querySelector('.glyph').innerHTML = glyphHTML(F06) + '<span class="badge">✨</span>';
-    SND.success();
-    showToast('✨ has desbloqueado 06_nosotras');
-  }
-}
+    const maxW = window.innerWidth - (isMobile() ? 12 : 24);
+    const maxH = window.innerHeight - TASKBAR_H - (isMobile() ? 16 : 40);
+    const targetW = Math.min(width || 320, maxW);
+    const targetH = height ? Math.min(height, maxH) : null;
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  if (!t) return;
-  t.textContent = msg; 
-  t.classList.add('show');
-  clearTimeout(t._tm);
-  t._tm = setTimeout(() => t.classList.remove('show'), 2600);
-}
+    const el = document.createElement('div');
+    el.className = 'window';
+    el.style.width = targetW + 'px';
+    if (targetH) el.style.height = targetH + 'px';
+    el.style.maxHeight = maxH + 'px';
+    el.style.zIndex = ++zTop;
 
-function nextPos() {
-  cascade = (cascade + 1) % 7;
-  return { x: 80 + cascade * 26, y: 40 + cascade * 22 };
-}
-
-function createWindow({ id, title, icon, width, height, bodyHTML, path, statusText, onMount }) {
-  if (openWindows[id]) {
-    const w = openWindows[id];
-    if (w.minimized) { 
-      w.el.style.display = 'flex'; 
-      w.minimized = false; 
-    }
-    bringToFront(id);
-    return w;
-  }
-  
-  const screenW = window.innerWidth;
-  const screenH = window.innerHeight;
-  const isMobile = screenW < 600;
-  
-  let targetWidth = width || 320;
-  if (isMobile) {
-    targetWidth = Math.min(screenW - 12, targetWidth);
-  }
-  
-  let targetHeight = height;
-  if (isMobile && height) {
-    targetHeight = Math.min(screenH - 80, targetHeight);
-  }
-  
-  let pos = nextPos();
-  if (isMobile) {
-    const count = Object.keys(openWindows).length;
-    pos = {
-      x: 6 + (count * 8) % 30,
-      y: 6 + (count * 8) % 50
-    };
-  }
-  
-  const win = document.createElement('div');
-  win.className = 'window';
-  win.style.width = targetWidth + 'px';
-  win.style.left = pos.x + 'px';
-  win.style.top = pos.y + 'px';
-  win.style.zIndex = ++zTop;
-  if (targetHeight) win.style.height = targetHeight + 'px';
-  
-  win.innerHTML = `
-    <div class="titlebar">
-      <span class="ticon">${icon || '🗂️'}</span>
-      <span class="ttext">${title}</span>
-      <div class="titlebar-btns">
-        <div class="titlebar-btn tb-min">_</div>
-        <div class="titlebar-btn tb-close">x</div>
+    el.innerHTML = `
+      <div class="titlebar">
+        <span class="ticon">${icon || '🗂️'}</span>
+        <span class="ttext">${title}</span>
+        <div class="titlebar-btns">
+          <button class="titlebar-btn tb-min" type="button" aria-label="Minimizar">_</button>
+          <button class="titlebar-btn tb-max" type="button" aria-label="Maximizar">□</button>
+          <button class="titlebar-btn tb-close" type="button" aria-label="Cerrar">x</button>
+        </div>
       </div>
-    </div>
-    ${path ? `<div class="pathbar">📁 <div class="pbox">${path}</div></div>` : ''}
-    <div class="window-body">${bodyHTML}</div>
-    ${statusText ? `<div class="statusbar"><span>${statusText}</span><span>WinGei 98</span></div>` : ''}
-    <div class="win-resize-handle"></div>
-  `;
-  winLayer.appendChild(win);
-  makeDraggable(win);
-  makeResizable(win, win.querySelector('.win-resize-handle'));
-  
-  win.addEventListener('mousedown', () => bringToFront(id));
-  win.querySelector('.tb-close').addEventListener('click', (e) => { 
-    e.stopPropagation(); 
-    closeWindow(id); 
-  });
-  win.querySelector('.tb-min').addEventListener('click', (e) => { 
-    e.stopPropagation(); 
-    minimizeWindow(id); 
-  });
-  
-  openWindows[id] = { el: win, title, icon, minimized: false };
-  addTaskbarBtn(id, title, icon);
-  bringToFront(id);
-  if (onMount) onMount(win);
-  return openWindows[id];
-}
+      ${path ? `<div class="pathbar">📁 <div class="pbox">${path}</div></div>` : ''}
+      <div class="window-body">${bodyHTML || ''}</div>
+      ${statusText ? `<div class="statusbar"><span>${statusText}</span><span>WinGei 98</span></div>` : ''}
+      <div class="win-resize-handle" aria-hidden="true"></div>
+    `;
 
-let activeWinId = null;
-function bringToFront(id) {
-  const w = openWindows[id]; 
-  if (!w) return;
-  w.el.style.zIndex = ++zTop;
-  document.querySelectorAll('.window').forEach(el => el.classList.add('inactive'));
-  w.el.classList.remove('inactive');
-  document.querySelectorAll('.taskbar-app').forEach(b => b.classList.toggle('active', b.dataset.id === id));
-  activeWinId = id;
-}
+    layer().appendChild(el);
 
-function closeWindow(id) {
-  const w = openWindows[id]; 
-  if (!w) return;
-  SND.close();
-  w.el.remove();
-  const btn = document.querySelector(`.taskbar-app[data-id="${id}"]`);
-  if (btn) btn.remove();
-  delete openWindows[id];
-  if (activeWinId === id) activeWinId = null;
-}
+    const pos = nextPos(el.offsetWidth, el.offsetHeight);
+    el.style.left = pos.x + 'px';
+    el.style.top = pos.y + 'px';
+    clampIntoView(el);
 
-function minimizeWindow(id) {
-  const w = openWindows[id]; 
-  if (!w) return;
-  w.el.style.display = 'none'; 
-  w.minimized = true;
-  const btn = document.querySelector(`.taskbar-app[data-id="${id}"]`);
-  if (btn) btn.classList.remove('active');
-  if (activeWinId === id) activeWinId = null;
-}
+    const win = { el, id, title, icon, minimized: false, maximized: false, onClose: onClose || null, prevRect: null };
+    windows[id] = win;
 
-function restoreWindow(id) {
-  const w = openWindows[id]; 
-  if (!w) return;
-  if (w.minimized) { 
-    w.el.style.display = 'flex'; 
-    w.minimized = false; 
-    bringToFront(id); 
-  } else if (activeWinId === id) { 
-    minimizeWindow(id); 
-  } else { 
-    bringToFront(id); 
-  }
-}
+    makeDraggable(win);
+    makeResizable(win);
 
-function addTaskbarBtn(id, title, icon) {
-  const btn = document.createElement('div');
-  btn.className = 'taskbar-app pixel-btn'; 
-  btn.dataset.id = id;
-  btn.innerHTML = `<span>${icon || '🗂️'}</span><span>${title}</span>`;
-  btn.addEventListener('click', () => { SND.click(); restoreWindow(id); });
-  taskbarApps.appendChild(btn);
-}
+    // pointerdown (no mousedown): asi el foco tambien funciona con dedo.
+    el.addEventListener('pointerdown', () => focus(id));
+    el.querySelector('.tb-close').addEventListener('click', e => { e.stopPropagation(); close(id); });
+    el.querySelector('.tb-min').addEventListener('click', e => { e.stopPropagation(); minimize(id); });
+    el.querySelector('.tb-max').addEventListener('click', e => { e.stopPropagation(); toggleMaximize(id); });
+    el.querySelector('.titlebar').addEventListener('dblclick', () => toggleMaximize(id));
 
-function makeDraggable(win) {
-  const bar = win.querySelector('.titlebar');
-  let dragging = false, sx = 0, sy = 0, ox = 0, oy = 0;
-  
-  bar.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('.titlebar-btn')) return;
-    dragging = true; 
-    win.classList.add('dragging');
-    sx = e.clientX; 
-    sy = e.clientY;
-    ox = win.offsetLeft; 
-    oy = win.offsetTop;
-    bar.setPointerCapture(e.pointerId);
-  });
-  
-  bar.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
-    let nx = ox + (e.clientX - sx), ny = oy + (e.clientY - sy);
-    nx = Math.max(-60, Math.min(window.innerWidth - 120, nx));
-    ny = Math.max(0, Math.min(window.innerHeight - 70, ny));
-    win.style.left = nx + 'px'; 
-    win.style.top = ny + 'px';
-  });
-  
-  bar.addEventListener('pointerup', () => { dragging = false; win.classList.remove('dragging'); });
-  bar.addEventListener('pointercancel', () => { dragging = false; win.classList.remove('dragging'); });
-}
-
-function makeResizable(win, handle) {
-  let resizing = false, sx = 0, sy = 0, sw = 0, sh = 0;
-  
-  handle.addEventListener('pointerdown', (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    resizing = true;
-    sx = e.clientX;
-    sy = e.clientY;
-    sw = win.offsetWidth;
-    sh = win.offsetHeight;
-    handle.setPointerCapture(e.pointerId);
-  });
-  
-  handle.addEventListener('pointermove', (e) => {
-    if (!resizing) return;
-    let nw = sw + (e.clientX - sx), nh = sh + (e.clientY - sy);
-    nw = Math.max(260, Math.min(window.innerWidth - win.offsetLeft, nw));
-    nh = Math.max(120, Math.min(window.innerHeight - win.offsetTop - 34, nh));
-    win.style.width = nw + 'px';
-    win.style.height = nh + 'px';
-  });
-  
-  handle.addEventListener('pointerup', () => { resizing = false; });
-  handle.addEventListener('pointercancel', () => { resizing = false; });
-}
-
-/* ================= 4. CONSTRUCTORES DE CONTENIDO DE VENTANA ================= */
-function pathFor(item) {
-  if (item === F_4MESES) return '4_meses';
-  for (const sub of [F01, F02, F03, F04, F05, F06]) {
-    if (sub === item) return '4_meses\\' + sub.name;
-    if (sub.children && sub.children.includes(item)) return '4_meses\\' + sub.name + '\\' + item.name;
-  }
-  return item.name;
-}
-
-function openFolderWindow(item) {
-  const win = createWindow({
-    id: item.id, 
-    title: item.name, 
-    icon: item === F_4MESES ? '📁' : (item.locked ? '💗' : '📁'),
-    width: item === F_4MESES ? 430 : 380, 
-    height: item === F_4MESES ? 300 : 280,
-    bodyHTML: '', 
-    path: pathFor(item),
-    statusText: `${item.children.length} objeto(s)`
-  });
-
-  const body = win.el.querySelector('.window-body');
-  body.innerHTML = ''; // Clear to prevent duplicated icons under all conditions
-
-  const grid = document.createElement('div');
-  grid.className = 'icon-grid';
-  body.appendChild(grid);
-  item.children.forEach(child => grid.appendChild(makeIconEl(child)));
-}
-
-function noteWrap(text) {
-  return text.split('\n').map(l => l === '' ? '<br>' : escapeHTML(l)).join('<br>');
-}
-function escapeHTML(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-
-function openNoteHandWindow(item) {
-  const isFinal = item.special === 'final';
-  let imgHTML = '';
-  if (item.src) {
-    imgHTML = `<div style="text-align:center;margin-top:12px;">
-      <img src="${item.src}" style="max-width:100%;height:auto;border:1px solid var(--ink);box-shadow:inset 1px 1px 0 #fff;background:#fff;" />
-    </div>`;
-  }
-  createWindow({
-    id: item.id, 
-    title: item.name, 
-    icon: '📝',
-    width: isFinal ? 440 : 380,
-    bodyHTML: `<div class="note-hand" style="${isFinal ? 'font-size:23px;' : ''}">
-      <span class="sticker" style="top:6px;right:10px;">${isFinal ? '💌' : '🩷'}</span>
-      ${noteWrap(item.text)}
-      ${imgHTML}
-    </div>`,
-    statusText: 'bloc de notas'
-  });
-}
-
-function openNoteMonoWindow(item) {
-  createWindow({
-    id: item.id, 
-    title: item.name, 
-    icon: '📄', 
-    width: 300,
-    bodyHTML: `<div class="note-mono">${escapeHTML(item.text)}</div>`,
-    statusText: 'solo lectura'
-  });
-}
-
-function openIlloWindow(item) {
-  let contentHTML = '';
-  // Soporte para imágenes subidas por el usuario
-  if (item.type === 'image' || item.src) {
-    contentHTML = `<div class="illo-wrap">
-      <img src="${item.src}" style="max-width:100%;height:auto;border:1px solid var(--ink);box-shadow:inset 1px 1px 0 #fff;background:#fff;" />
-      <div class="illo-caption">${item.caption || ''}</div>
-    </div>`;
-  } else {
-    contentHTML = `<div class="illo-wrap">
-      ${ILLO[item.illo]}
-      <div class="illo-caption">${item.caption || ''}</div>
-    </div>`;
-  }
-  
-  createWindow({
-    id: item.id, 
-    title: item.name, 
-    icon: '🖼️', 
-    width: 340,
-    bodyHTML: contentHTML,
-    statusText: 'visor de imágenes'
-  });
-}
-
-function openPlayerWindow(item, kind) {
-  const bars = Array.from({ length: 14 }, () => Math.round(6 + Math.random() * 26));
-  
-  let playerBody = '';
-  // Soporte para vídeo subido por el usuario
-  if (kind === 'video' && item.src) {
-    playerBody = `<div class="player">
-      <div class="player-title">${item.title}</div>
-      <video src="${item.src}" controls style="max-width:100%;height:auto;border:1.5px solid var(--ink);background:#000;"></video>
-      <div class="player-caption">${item.caption || ''}</div>
-    </div>`;
-  } else {
-    playerBody = `<div class="player">
-      <div class="player-cover-container">
-        <img class="player-cover" id="cover-${item.id}" src="${item.cover || 'Imagenes/mp3.jpg'}" alt="Cover Art">
-      </div>
-      <div class="player-title">${item.title}</div>
-      ${item.artist ? `<div class="player-artist">${item.artist}</div>` : ''}
-      <div class="play-btn" id="play-${item.id}">▶</div>
-      <div class="waveform">${bars.map(h => `<span style="height:${h}px"></span>`).join('')}</div>
-      <div class="player-caption">${item.caption || ''}</div>
-    </div>`;
+    addTaskbarBtn(win);
+    focus(id);
+    // En movil el contenido se ve mejor a pantalla completa (los dialogos no).
+    if (isMobile() && fitMobile) maximize(id);
+    if (onMount) onMount(el, win);
+    return win;
   }
 
-  createWindow({
-    id: item.id, 
-    title: item.name, 
-    icon: kind === 'audio' ? '🎵' : '🖤', 
-    width: 300,
-    bodyHTML: playerBody,
-    statusText: kind === 'audio' ? 'reproductor de medios' : 'visor de video',
-    onMount: (win) => {
-      const playBtn = win.querySelector('#play-' + item.id);
-      if (!playBtn) return; // El vídeo usa controles nativos
-      
-      const coverImg = win.querySelector('#cover-' + item.id);
-      
-      // Soporte para audio subido por el usuario
-      if (item.src) {
-        const audio = new Audio(item.src);
-        let playing = false;
-        
-        playBtn.addEventListener('click', () => {
-          SND.click();
-          if (playing) {
-            audio.pause();
-            playBtn.textContent = '▶';
-            playing = false;
-            if (coverImg) coverImg.classList.remove('playing');
-          } else {
-            audio.play().catch(e => {
-              console.error("Error al reproducir audio:", e);
-              SND.error();
-              showToast("no se pudo reproducir el audio 😭");
-            });
-            playBtn.textContent = '⏸';
-            playing = true;
-            if (coverImg) coverImg.classList.add('playing');
-          }
-        });
-        
-        // Detener sonido cuando cierran la ventana
-        win.querySelector('.tb-close').addEventListener('click', () => {
-          audio.pause();
-        });
-      } else {
-        // Caso demo de audio sin archivo vinculado
-        playBtn.addEventListener('click', () => {
-          SND.error();
-          showToast(kind === 'audio' ? 'no se puede reproducir aquí 🙃' : 'formato no compatible 😭');
-        });
-      }
+  function focus(id) {
+    const win = windows[id];
+    if (!win || win.minimized) return;
+    win.el.style.zIndex = ++zTop;
+    Object.values(windows).forEach(w => w.el.classList.toggle('inactive', w.id !== id));
+    document.querySelectorAll('.taskbar-app').forEach(b => b.classList.toggle('active', b.dataset.id === id));
+    activeId = id;
+  }
+
+  function close(id) {
+    const win = windows[id];
+    if (!win) return;
+    SND.close();
+    if (win.onClose) { try { win.onClose(); } catch (e) { console.error(e); } }
+    win.el.remove();
+    const btn = document.querySelector(`.taskbar-app[data-id="${id}"]`);
+    if (btn) btn.remove();
+    delete windows[id];
+    if (activeId === id) {
+      activeId = null;
+      focusTopmost();
     }
-  });
-}
+  }
 
-let dlgCount = 0;
-function openDialog({ title, icon, text, buttons }) {
-  const id = 'dlg' + (++dlgCount);
-  const win = createWindow({
-    id, 
-    title, 
-    icon: icon || '⚠️', 
-    width: 300,
-    bodyHTML: `<div class="dialog-body"><div class="dialog-icon">${icon || '⚠️'}</div><div class="dialog-text">${text}</div></div>
-      <div class="dialog-btns">${buttons.map((b, i) => `<button class="pixel-btn dlg-btn" data-i="${i}">${b.label}</button>`).join('')}</div>`,
-  });
-  
-  win.el.querySelectorAll('.dlg-btn').forEach((b, i) => {
-    b.addEventListener('click', (e) => {
+  function focusTopmost() {
+    const open = Object.values(windows).filter(w => !w.minimized);
+    if (!open.length) return;
+    open.sort((a, b) => Number(a.el.style.zIndex) - Number(b.el.style.zIndex));
+    focus(open[open.length - 1].id);
+  }
+
+  function minimize(id) {
+    const win = windows[id];
+    if (!win) return;
+    win.el.classList.add('minimized');
+    win.minimized = true;
+    const btn = document.querySelector(`.taskbar-app[data-id="${id}"]`);
+    if (btn) btn.classList.remove('active');
+    if (activeId === id) { activeId = null; focusTopmost(); }
+  }
+
+  function restore(id) {
+    const win = windows[id];
+    if (!win) return;
+    win.el.classList.remove('minimized');
+    win.minimized = false;
+    focus(id);
+  }
+
+  /** Click en la barra de tareas: restaura, enfoca o minimiza segun el estado. */
+  function toggleFromTaskbar(id) {
+    const win = windows[id];
+    if (!win) return;
+    if (win.minimized) restore(id);
+    else if (activeId === id) minimize(id);
+    else focus(id);
+  }
+
+  function maximize(id) {
+    const win = windows[id];
+    if (!win || win.maximized) return;
+    const { el } = win;
+    win.prevRect = { left: el.style.left, top: el.style.top, width: el.style.width, height: el.style.height };
+    win.maximized = true;
+    el.classList.add('maximized');
+    el.style.left = '0px';
+    el.style.top = '0px';
+    el.style.width = '100%';
+    el.style.height = '100%';
+    el.style.maxHeight = 'none';
+  }
+
+  function unmaximize(id) {
+    const win = windows[id];
+    if (!win || !win.maximized) return;
+    const { el, prevRect } = win;
+    win.maximized = false;
+    el.classList.remove('maximized');
+    Object.assign(el.style, prevRect || {});
+    el.style.maxHeight = (window.innerHeight - TASKBAR_H - 40) + 'px';
+    clampIntoView(el);
+  }
+
+  function toggleMaximize(id) {
+    SND.click();
+    const win = windows[id];
+    if (!win) return;
+    win.maximized ? unmaximize(id) : maximize(id);
+  }
+
+  function addTaskbarBtn(win) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'taskbar-app pixel-btn';
+    btn.dataset.id = win.id;
+    btn.innerHTML = `<span class="tba-icon">${win.icon || '🗂️'}</span><span class="tba-label">${win.title}</span>`;
+    btn.addEventListener('click', () => { SND.click(); toggleFromTaskbar(win.id); });
+    tray().appendChild(btn);
+  }
+
+  /* ---------- arrastre ---------- */
+
+  function makeDraggable(win) {
+    const bar = win.el.querySelector('.titlebar');
+    let dragging = false, sx = 0, sy = 0, ox = 0, oy = 0;
+
+    bar.addEventListener('pointerdown', e => {
+      if (e.target.closest('.titlebar-btn')) return;
+      if (win.maximized) return;           // una ventana maximizada no se mueve
+      dragging = true;
+      win.el.classList.add('dragging');
+      sx = e.clientX; sy = e.clientY;
+      ox = win.el.offsetLeft; oy = win.el.offsetTop;
+      bar.setPointerCapture(e.pointerId);
+    });
+
+    bar.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      e.preventDefault();
+      const nx = Math.max(-60, Math.min(window.innerWidth - 120, ox + (e.clientX - sx)));
+      const ny = Math.max(0, Math.min(window.innerHeight - TASKBAR_H - 24, oy + (e.clientY - sy)));
+      win.el.style.left = nx + 'px';
+      win.el.style.top = ny + 'px';
+    });
+
+    const end = () => { dragging = false; win.el.classList.remove('dragging'); };
+    bar.addEventListener('pointerup', end);
+    bar.addEventListener('pointercancel', end);
+  }
+
+  /* ---------- redimensionado ---------- */
+
+  function makeResizable(win) {
+    const handle = win.el.querySelector('.win-resize-handle');
+    let resizing = false, sx = 0, sy = 0, sw = 0, sh = 0;
+
+    handle.addEventListener('pointerdown', e => {
       e.stopPropagation();
-      closeWindow(id);
-      if (buttons[i].onClick) buttons[i].onClick();
+      e.preventDefault();
+      if (win.maximized) return;
+      resizing = true;
+      sx = e.clientX; sy = e.clientY;
+      sw = win.el.offsetWidth; sh = win.el.offsetHeight;
+      handle.setPointerCapture(e.pointerId);
     });
-  });
-  return id;
-}
 
-function openExeDialog(item) {
-  openDialog({
-    title: 'bolita rosa.exe', 
-    icon: '📁',
-    text: '¿Deseas eliminar "bolita rosa.exe"?',
-    buttons: [
-      { 
-        label: 'Sí', 
-        onClick: () => {
-          SND.error();
-          openDialog({
-            title: 'Error',
-            icon: '❌',
-            text: '<strong>Desinstalación fallida.</strong><br><br>"bolita rosa.exe" no puede ser eliminado.<br><br>Motivo:<br>Marcó mi vida demasiado profundo como para enviarlo a la papelera.<br><br>El sistema recomienda conservar este archivo para siempre.',
-            buttons: [
-              {
-                label: 'Entendido',
-                onClick: () => {
-                  SND.click();
-                }
-              }
-            ]
-          });
-        } 
-      },
-      { 
-        label: 'No', 
-        onClick: () => { 
-          SND.click();
-          showToast('Decisión sabia. Bolita rosa se queda.'); 
-        } 
-      }
-    ]
-  });
-}
+    handle.addEventListener('pointermove', e => {
+      if (!resizing) return;
+      const minW = Math.min(220, window.innerWidth - 20);
+      const nw = Math.max(minW, Math.min(window.innerWidth - win.el.offsetLeft - 4, sw + (e.clientX - sx)));
+      const nh = Math.max(120, Math.min(window.innerHeight - win.el.offsetTop - TASKBAR_H - 4, sh + (e.clientY - sy)));
+      win.el.style.width = nw + 'px';
+      win.el.style.height = nh + 'px';
+      win.el.style.maxHeight = 'none';
+    });
 
-function openSpecialWindow(item) {
-  if (item.special === 'mypc') {
-    createWindow({ 
-      id: 'mypc', 
-      title: 'Propiedades del sistema', 
-      icon: '🖥️', 
-      width: 300,
-      bodyHTML: `<div class="note-mono">Sistema: Windows Geiversario 98
-Procesador: Corazón Dual Core, 4.0 MHz
-Memoria RAM: 4 meses (en uso: 100%)
-Disco C:: 99% lleno de recuerdos sin organizar
-Edición: especial — amistad</div>` 
-    });
-  } 
-  else if (item.special === 'trash') {
-    createWindow({ 
-      id: 'trash', 
-      title: 'Papelera de reciclaje', 
-      icon: '🗑️', 
-      width: 280,
-      bodyHTML: `<div class="note-mono">no hay nada aquí.
-todo lo importante se quedó guardado.</div>` 
-    });
+    const end = () => { resizing = false; };
+    handle.addEventListener('pointerup', end);
+    handle.addEventListener('pointercancel', end);
   }
-  else if (item.special === 'ytplayer') {
-    openYtPlayerWindow(item);
-  }
-}
 
-function openYtPlayerWindow(item) {
-  createWindow({
-    id: item.id,
-    title: 'CD Player (Música)',
-    icon: '🎵',
-    width: 300,
-    bodyHTML: `<div class="player">
-      <div class="player-cover-container">
-        <img class="player-cover" id="cd-cover" src="Imagenes/mp3.jpg" alt="Cover Art">
-      </div>
-      <div class="player-title" style="margin:0;">CD Player</div>
-      <div class="player-artist" style="color:var(--shadow);margin-bottom:2px;">Música de Fondo</div>
-      
-      <div style="background:#000;color:#00ff00;font-family:monospace;padding:6px 10px;width:100%;box-sizing:border-box;border:2px solid var(--shadow);display:flex;justify-content:space-between;align-items:center;font-size:13px;border-radius:2px;box-shadow:inset 1px 1px 0 rgba(0,0,0,.5);margin-top:2px;">
-        <div>[TRACK 01]</div>
-        <div id="cd-status">PLAYING</div>
-      </div>
-      
-      <!-- Control de Volumen -->
-      <div style="display:flex;align-items:center;gap:8px;width:100%;font-size:11px;margin:4px 0;color:var(--shadow);">
-        <span>Volumen:</span>
-        <input type="range" id="cd-volume" min="0" max="1" step="0.05" value="0.7" style="flex:1;cursor:pointer;">
-      </div>
-      
-      <div style="display:flex;gap:6px;margin-top:4px;width:100%;">
-        <button class="pixel-btn" id="cd-play" style="flex:1;font-weight:bold;height:24px;">Play ▶</button>
-        <button class="pixel-btn" id="cd-pause" style="flex:1;font-weight:bold;height:24px;">Pause ⏸</button>
-        <button class="pixel-btn" id="cd-stop" style="flex:1;font-weight:bold;height:24px;">Stop ■</button>
-      </div>
-    </div>`,
-    statusText: 'reproductor de cd',
-    onMount: (win) => {
-      const audio = window.bgAudioPlayer;
-      const statusText = win.querySelector('#cd-status');
-      const volumeSlider = win.querySelector('#cd-volume');
-      const cdCover = win.querySelector('#cd-cover');
-      
-      if (statusText) {
-        statusText.textContent = window.bgPlayerStarted ? 'PLAYING' : 'READY';
-      }
-      
-      if (cdCover && window.bgPlayerStarted) {
-        cdCover.classList.add('playing');
-      }
-      
-      if (audio) {
-        if (!audio.volumeSet) {
-          audio.volume = 0.7;
-          audio.volumeSet = true;
-        }
-        if (volumeSlider) {
-          volumeSlider.value = audio.volume;
-        }
-      }
+  /* ---------- reacciones globales ---------- */
 
-      if (volumeSlider) {
-        volumeSlider.addEventListener('input', (e) => {
-          if (audio) {
-            audio.volume = e.target.value;
-          }
-        });
-      }
-
-      win.querySelector('#cd-play').addEventListener('click', () => {
-        SND.click();
-        if (audio) {
-          audio.play().catch(e => console.error("Error reproduciendo audio:", e));
-          window.bgPlayerStarted = true;
-          if (statusText) statusText.textContent = 'PLAYING';
-          if (cdCover) cdCover.classList.add('playing');
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      Object.values(windows).forEach(win => {
+        if (win.maximized) {
+          win.el.style.height = '100%';
+          return;
         }
+        const maxW = window.innerWidth - 12;
+        if (win.el.offsetWidth > maxW) win.el.style.width = maxW + 'px';
+        win.el.style.maxHeight = (window.innerHeight - TASKBAR_H - 16) + 'px';
+        clampIntoView(win.el);
       });
-      win.querySelector('#cd-pause').addEventListener('click', () => {
-        SND.click();
-        if (audio) {
-          audio.pause();
-          if (statusText) statusText.textContent = 'PAUSED';
-          if (cdCover) cdCover.classList.remove('playing');
-        }
-      });
-      win.querySelector('#cd-stop').addEventListener('click', () => {
-        SND.click();
-        if (audio) {
-          audio.pause();
-          audio.currentTime = 0;
-          window.bgPlayerStarted = false;
-          if (statusText) statusText.textContent = 'STOPPED';
-          if (cdCover) cdCover.classList.remove('playing');
-        }
-      });
-    }
+    }, 120);
   });
+
+  // Escape cierra la ventana activa.
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && activeId) close(activeId);
+  });
+
+  return {
+    create, close, focus, minimize, restore, toggleMaximize,
+    get activeId() { return activeId; },
+    has: id => Boolean(windows[id]),
+    get: id => windows[id]
+  };
+})();
+
+/* Alias cortos para el resto del codigo (apps.js / system.js). */
+const createWindow = opts => WM.create(opts);
+const closeWindow = id => WM.close(id);
+
+/* ---------- avisos flotantes ---------- */
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.remove('show'), 2600);
 }

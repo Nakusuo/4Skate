@@ -6,10 +6,13 @@
 <title>4_meses</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#D9C2EC">
+<meta name="description" content="WinGei 98 — una cápsula del tiempo de 4 meses.">
 <link rel="stylesheet" href="css/variables.css">
 <link rel="stylesheet" href="css/desktop.css">
 <link rel="stylesheet" href="css/windows.css">
 <link rel="stylesheet" href="css/apps.css">
+<link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 
@@ -17,22 +20,22 @@
   <div>WinGei98 BIOS v4.0<br>(C) cápsula del tiempo, todos los derechos del corazón reservados<br><br></div>
   <div id="boot-lines"></div>
   <div id="boot-bar"><div id="boot-bar-fill"></div></div>
-  <div style="margin-top:8px;font-size:12px;">cargando 4 meses<span class="blink">_</span></div>
+  <div class="boot-caption">cargando 4 meses<span class="blink">_</span></div>
 </div>
 
-<div id="desktop">
+<main id="desktop">
   <div class="desktop-icons" id="desktop-icons"></div>
-</div>
+</main>
 
 <div id="windows-layer"></div>
 
-<div id="start-menu">
+<nav id="start-menu" aria-label="Menú de inicio">
   <div class="start-side"><span>WinGei 98</span></div>
   <div class="start-list" id="start-list"></div>
-</div>
+</nav>
 
 <div id="taskbar">
-  <button id="start-btn" class="pixel-btn"><span class="flag">🩷</span>Inicio</button>
+  <button id="start-btn" class="pixel-btn" type="button"><span class="flag">🩷</span><span class="start-label">Inicio</span></button>
   <div class="tb-sep"></div>
   <div id="taskbar-apps"></div>
   <div id="systray"><span id="clock">00:00</span></div>
@@ -45,9 +48,14 @@
 
 <div id="toast"></div>
 
+<!-- Orden: efectos → audio → recursos → datos → chrome → apps → escritorio → sistema -->
 <script src="js/sound.js" defer></script>
+<script src="js/audio.js" defer></script>
+<script src="js/assets.js" defer></script>
 <script src="js/data.js" defer></script>
 <script src="js/windowManager.js" defer></script>
+<script src="js/apps.js" defer></script>
+<script src="js/desktop.js" defer></script>
 <script src="js/system.js" defer></script>
 </body>
 </html>

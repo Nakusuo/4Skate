@@ -1,6 +1,10 @@
-/* ---------- DESKTOP ---------- */
+/* ================= ESCRITORIO, ICONOS, BARRA DE TAREAS Y MENU (desktop.css) ================= */
+
+/* ---------- ESCRITORIO ---------- */
 #desktop{
-  position:fixed;inset:0;bottom:34px;
+  position:fixed;
+  inset:0;
+  bottom:var(--taskbar-h);
   background:
     radial-gradient(circle at 15% 20%, rgba(255,255,255,.5) 0, transparent 2px),
     radial-gradient(circle at 65% 10%, rgba(255,255,255,.4) 0, transparent 2px),
@@ -14,85 +18,190 @@
   overflow:hidden;
 }
 #desktop::after{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:repeating-linear-gradient(0deg, rgba(74,53,80,.025) 0px, rgba(74,53,80,.025) 1px, transparent 1px, transparent 3px);
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(74,53,80,.025) 0 1px,transparent 1px 3px);
 }
+
+/* ---------- ICONOS ---------- */
+/* Rejilla en columnas: se rellena hacia abajo y salta de columna al llenarse,
+   igual que un escritorio real, pero sin desbordar en pantallas bajas. */
 .desktop-icons{
-  position:absolute;top:14px;left:10px;display:flex;flex-direction:column;flex-wrap:wrap;align-content:flex-start;gap:6px;
-  max-height:calc(100% - 28px);
+  position:absolute;
+  inset:14px auto 14px 10px;
+  display:grid;
+  grid-auto-flow:column;
+  grid-template-rows:repeat(auto-fill,minmax(74px,max-content));
+  grid-auto-columns:var(--icon-w);
+  justify-content:start;
+  gap:6px 4px;
+  max-width:calc(100% - 20px);
+  overflow-x:auto;
+  overflow-y:hidden;
 }
+
 .icon{
-  width:78px;display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:4px 2px;user-select:none;
+  width:var(--icon-w);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  padding:4px 2px;
+  user-select:none;
+  background:none;
+  border:0;
 }
 .icon .glyph{
-  width:38px;height:38px;display:flex;align-items:center;justify-content:center;
-  font-size:30px;filter:drop-shadow(1px 1px 0 rgba(74,53,80,.45));
+  width:var(--icon-glyph);
+  height:var(--icon-glyph);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+  filter:drop-shadow(1px 1px 0 rgba(74,53,80,.45));
   position:relative;
 }
-.icon .glyph svg{width:36px;height:36px;}
+.icon .glyph svg{width:calc(var(--icon-glyph) - 2px);height:calc(var(--icon-glyph) - 2px);}
 .icon .badge{
-  position:absolute;bottom:-4px;right:-6px;font-size:15px;
+  position:absolute;
+  bottom:-4px;
+  right:-6px;
+  font-size:15px;
   filter:drop-shadow(1px 1px 0 rgba(74,53,80,.6));
 }
 .icon .label{
-  color:#fff;font-size:11px;text-align:center;line-height:1.2;
-  text-shadow:1px 1px 0 var(--ink), -1px -1px 0 var(--ink), 1px -1px 0 var(--ink), -1px 1px 0 var(--ink);
-  padding:1px 3px;max-width:76px;word-break:break-word;
+  color:#fff;
+  font-size:11px;
+  text-align:center;
+  line-height:1.2;
+  text-shadow:1px 1px 0 var(--ink),-1px -1px 0 var(--ink),1px -1px 0 var(--ink),-1px 1px 0 var(--ink);
+  padding:1px 3px;
+  max-width:calc(var(--icon-w) - 2px);
+  overflow-wrap:anywhere;
 }
-.icon.selected .label{background:#B79AD6;outline:1px dotted #fff;text-shadow:none;}
+.icon.selected .label{background:var(--lilac-deep);outline:1px dotted #fff;text-shadow:none;}
 .icon.locked .glyph{filter:grayscale(.55) opacity(.7);}
 
-/* ---------- TASKBAR ---------- */
+/* ---------- BARRA DE TAREAS ---------- */
 #taskbar{
-  position:fixed;left:0;right:0;bottom:0;height:34px;
-  background:linear-gradient(180deg, var(--blush) 0%, var(--lilac) 100%);
-  border-top:2px solid #fff;display:flex;align-items:center;padding:0 4px;gap:6px;z-index:5000;
+  position:fixed;
+  left:0;right:0;bottom:0;
+  height:var(--taskbar-h);
+  background:linear-gradient(180deg,var(--blush) 0%,var(--lilac) 100%);
+  border-top:2px solid #fff;
+  display:flex;
+  align-items:center;
+  padding:0 4px;
+  gap:6px;
+  z-index:5000;
 }
 #start-btn{
-  display:flex;align-items:center;gap:5px;font-weight:bold;font-size:12px;height:26px;padding:0 10px 0 6px;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-weight:bold;
+  font-size:12px;
+  height:26px;
+  padding:0 10px 0 6px;
+  flex:0 0 auto;
 }
 #start-btn .flag{font-size:14px;}
-#start-btn.active{
-  border-top:2px solid var(--shadow);border-left:2px solid var(--shadow);
-  border-bottom:2px solid #fff;border-right:2px solid #fff;
-}
+#start-btn.active{border-color:var(--shadow) var(--shadow) #fff #fff;}
+
 .tb-sep{width:2px;height:24px;border-left:1px solid var(--shadow);border-right:1px solid #fff;}
-#taskbar-apps{flex:1;display:flex;gap:4px;overflow:hidden;height:26px;}
+
+#taskbar-apps{
+  flex:1 1 auto;
+  display:flex;
+  gap:4px;
+  height:26px;
+  min-width:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+}
+#taskbar-apps::-webkit-scrollbar{display:none;}
+
 .taskbar-app{
-  height:26px;min-width:120px;max-width:160px;display:flex;align-items:center;gap:5px;
-  padding:0 8px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  height:26px;
+  flex:1 1 120px;
+  min-width:40px;
+  max-width:160px;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:0 8px;
+  font-size:11px;
+  white-space:nowrap;
+  overflow:hidden;
 }
-.taskbar-app.active{
-  border-top:2px solid var(--shadow);border-left:2px solid var(--shadow);
-  border-bottom:2px solid #fff;border-right:2px solid #fff;
-}
+.taskbar-app .tba-label{overflow:hidden;text-overflow:ellipsis;}
+.taskbar-app .tba-icon{flex:0 0 auto;}
+.taskbar-app.active{border-color:var(--shadow) var(--shadow) #fff #fff;}
+
 #systray{
-  height:24px;padding:0 10px;display:flex;align-items:center;font-size:11px;gap:6px;
-  border-top:1px solid var(--shadow);border-left:1px solid var(--shadow);
-  border-bottom:1px solid #fff;border-right:1px solid #fff;background:var(--blush);
+  flex:0 0 auto;
+  height:24px;
+  padding:0 10px;
+  display:flex;
+  align-items:center;
+  font-size:11px;
+  gap:6px;
+  border-top:1px solid var(--shadow);
+  border-left:1px solid var(--shadow);
+  border-bottom:1px solid #fff;
+  border-right:1px solid #fff;
+  background:var(--blush);
 }
 
-/* ---------- START MENU ---------- */
+/* ---------- MENU DE INICIO ---------- */
 #start-menu{
-  position:fixed;left:2px;bottom:36px;width:210px;display:none;z-index:5001;
+  position:fixed;
+  left:2px;
+  bottom:calc(var(--taskbar-h) + 2px);
+  width:210px;
+  max-width:calc(100vw - 8px);
+  display:none;
+  z-index:5001;
   background:var(--cream);
-  box-shadow:inset 1px 1px 0 #fff, inset -1px -1px 0 var(--shadow), 2px 2px 0 rgba(74,53,80,.4);
+  box-shadow:inset 1px 1px 0 #fff,inset -1px -1px 0 var(--shadow),2px 2px 0 rgba(74,53,80,.4);
   border:1px solid var(--ink);
 }
 #start-menu.open{display:flex;}
+
 .start-side{
-  width:26px;background:linear-gradient(180deg,var(--blush-deep),var(--lilac-deep));
-  display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;
+  width:26px;
+  flex:0 0 26px;
+  background:linear-gradient(180deg,var(--blush-deep),var(--lilac-deep));
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding-bottom:10px;
 }
 .start-side span{
-  writing-mode:vertical-rl;transform:rotate(180deg);color:#fff;font-weight:bold;
-  font-size:13px;letter-spacing:1px;text-shadow:1px 1px 0 rgba(0,0,0,.25);
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);
+  color:#fff;
+  font-weight:bold;
+  font-size:13px;
+  letter-spacing:1px;
+  text-shadow:1px 1px 0 rgba(0,0,0,.25);
 }
-.start-list{flex:1;padding:4px;display:flex;flex-direction:column;}
+
+.start-list{flex:1;padding:4px;display:flex;flex-direction:column;min-width:0;}
 .menu-item{
-  display:flex;align-items:center;gap:8px;padding:6px 8px;font-size:12px;color:var(--ink);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 8px;
+  font-size:12px;
+  color:var(--ink);
+  background:none;
+  border:0;
+  text-align:left;
   user-select:none;
 }
-.menu-item:hover{background:var(--lilac-deep);color:#fff;}
+.menu-item:hover,.menu-item:focus-visible{background:var(--lilac-deep);color:#fff;}
 .menu-sep{height:1px;background:var(--rose);margin:4px 2px;}

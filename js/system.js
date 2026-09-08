@@ -1,197 +1,159 @@
-/* ================= RETRO SYSTEM ENTRYPOINT (system.js) ================= */
-// Este archivo coordina el reloj, menú de inicio, secuencias de arranque, apagado e inicialización.
+/* ================= SISTEMA (system.js) =================
+   Arranque del "SO": reloj, menu de inicio, secuencia de BIOS,
+   apagado e inicializacion general.
+======================================================================= */
 
-/* ================= 1. RELOJ DEL SISTEMA ================= */
+/* ================= RELOJ ================= */
 function updateClock() {
-  const d = new Date();
-  let h = d.getHours(); 
-  const m = d.getMinutes();
-  const ampm = h >= 12 ? 'p.m.' : 'a.m.';
-  h = h % 12; 
-  if (h === 0) h = 12;
-  const clockEl = document.getElementById('clock');
-  if (clockEl) {
-    clockEl.textContent = `${h}:${m.toString().padStart(2, '0')} ${ampm}`;
-  }
+  const el = document.getElementById('clock');
+  if (!el) return;
+  const now = new Date();
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const ampm = now.getHours() >= 12 ? 'p.m.' : 'a.m.';
+  const hours = now.getHours() % 12 || 12;
+  el.textContent = `${hours}:${minutes} ${ampm}`;
 }
 
-/* ================= 2. MENÚ DE INICIO ================= */
-const startBtn = document.getElementById('start-btn');
-const startMenu = document.getElementById('start-menu');
-const startList = document.getElementById('start-list');
+/* ================= MENU DE INICIO ================= */
+const StartMenu = {
+  get menu() { return document.getElementById('start-menu'); },
+  get button() { return document.getElementById('start-btn'); },
 
-function renderStartMenu() {
-  if (!startList) return;
-  startList.innerHTML = '';
-  MENU_ITEMS.forEach(mi => {
-    if (mi.sep) { 
-      const s = document.createElement('div'); 
-      s.className = 'menu-sep'; 
-      startList.appendChild(s); 
-      return; 
-    }
-    const d = document.createElement('div'); 
-    d.className = 'menu-item';
-    d.innerHTML = `<span>${mi.emoji}</span><span>${mi.label}</span>`;
-    d.addEventListener('click', (e) => { 
-      e.stopPropagation(); 
-      SND.click(); 
-      closeStartMenu(); 
-      mi.action(); 
+  render() {
+    const list = document.getElementById('start-list');
+    if (!list) return;
+    list.innerHTML = '';
+
+    MENU_ITEMS.forEach(entry => {
+      if (entry.sep) {
+        const sep = document.createElement('div');
+        sep.className = 'menu-sep';
+        list.appendChild(sep);
+        return;
+      }
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'menu-item';
+      item.innerHTML = `<span>${entry.emoji}</span><span>${entry.label}</span>`;
+      item.addEventListener('click', e => {
+        e.stopPropagation();
+        SND.click();
+        this.close();
+        entry.action();
+      });
+      list.appendChild(item);
     });
-    startList.appendChild(d);
-  });
-}
+  },
 
-function openStartMenu() { 
-  if (startMenu && startBtn) {
-    startMenu.classList.add('open'); 
-    startBtn.classList.add('active'); 
+  get isOpen() { return this.menu?.classList.contains('open'); },
+
+  open() {
+    this.menu?.classList.add('open');
+    this.button?.classList.add('active');
+  },
+
+  close() {
+    this.menu?.classList.remove('open');
+    this.button?.classList.remove('active');
+  },
+
+  toggle() { this.isOpen ? this.close() : this.open(); },
+
+  bind() {
+    this.button?.addEventListener('click', e => {
+      e.stopPropagation();
+      SND.click();
+      this.toggle();
+    });
+    document.addEventListener('click', e => {
+      if (!this.isOpen) return;
+      if (this.menu.contains(e.target) || this.button.contains(e.target)) return;
+      this.close();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && this.isOpen) this.close();
+    });
   }
-}
+};
 
-function closeStartMenu() { 
-  if (startMenu && startBtn) {
-    startMenu.classList.remove('open'); 
-    startBtn.classList.remove('active'); 
-  }
-}
-
-if (startBtn) {
-  startBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); 
-    SND.click();
-    startMenu.classList.contains('open') ? closeStartMenu() : openStartMenu();
-  });
-}
-
-document.addEventListener('click', (e) => {
-  if (startMenu && startBtn && !startMenu.contains(e.target) && e.target !== startBtn) {
-    closeStartMenu();
-  }
-  if (!e.target.closest('.icon')) {
-    document.querySelectorAll('.icon.selected').forEach(i => i.classList.remove('selected'));
-  }
-});
-
-function openAbout() {
-  createWindow({ 
-    id: 'about', 
-    title: 'Acerca de WinGei 98', 
-    icon: '💗', 
-    width: 300,
-    bodyHTML: `<div class="note-mono">WinGei 98
-edición especial de geiversario
-
-hecho a mano, con html, css y js,
-y bastante nostalgia.
-
-para Glenn. feliz geiversario.</div>` 
-  });
-}
-
+/* ================= APAGADO ================= */
 function confirmShutdown() {
   openDialog({
-    title: 'Apagar el sistema', 
+    title: 'Apagar el sistema',
     icon: '🔌',
     text: '¿deseas apagar tu equipo?',
     buttons: [
-      { label: 'Sí', onClick: () => doShutdown() },
+      { label: 'Sí', onClick: doShutdown },
       { label: 'Cancelar', onClick: () => {} }
     ]
   });
 }
 
 function doShutdown() {
-  const desktop = document.getElementById('desktop');
-  const taskbar = document.getElementById('taskbar');
-  const winLayer = document.getElementById('windows-layer');
-  
-  if (desktop) desktop.style.display = 'none';
-  if (taskbar) taskbar.style.display = 'none';
-  if (winLayer) winLayer.style.display = 'none';
-  
-  closeStartMenu();
-  
-  const scr = document.getElementById('shutdown-screen');
-  if (scr) {
-    scr.classList.add('show');
-    setTimeout(() => {
-      const finalMsg = document.getElementById('shutdown-final');
-      if (finalMsg) {
-        finalMsg.textContent = 'no esperaba que una ida al cine terminara convirtiéndose en una de mis amistades favoritas.\n\nfeliz geiversario, Glenn. 🩷';
-        finalMsg.classList.add('show');
-      }
-    }, 1600);
-  }
+  AudioHub.pauseAll();
+  StartMenu.close();
+
+  ['desktop', 'taskbar', 'windows-layer'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  const screen = document.getElementById('shutdown-screen');
+  if (!screen) return;
+  screen.classList.add('show');
+
+  setTimeout(() => {
+    const final = document.getElementById('shutdown-final');
+    if (!final) return;
+    final.textContent = 'no esperaba que una ida al cine terminara convirtiéndose en una de mis amistades favoritas.\n\nfeliz geiversario, Glenn. 🩷';
+    final.classList.add('show');
+  }, 1600);
 }
 
-/* ================= 3. SECUENCIA DE ARRANQUE ================= */
+/* ================= SECUENCIA DE ARRANQUE ================= */
 function runBoot() {
-  const cont = document.getElementById('boot-lines');
+  const lines = document.getElementById('boot-lines');
   const fill = document.getElementById('boot-bar-fill');
+  const screen = document.getElementById('boot-screen');
   let i = 0;
-  
-  function step() {
+
+  (function step() {
     if (i < BOOT_LINES.length) {
-      if (cont) cont.innerHTML += BOOT_LINES[i] + '\n';
+      if (lines) lines.textContent += BOOT_LINES[i] + '\n';
       if (fill) fill.style.width = ((i + 1) / BOOT_LINES.length * 100) + '%';
       i++;
       setTimeout(step, 420);
-    } else {
-      setTimeout(() => {
-        const bootScreen = document.getElementById('boot-screen');
-        if (bootScreen) bootScreen.style.display = 'none';
-        SND.success();
-
-        // Abrir automáticamente el CD Player (Música) al iniciar
-        const cdPlayItem = DESKTOP_ITEMS.find(it => it.special === 'ytplayer');
-        if (cdPlayItem) {
-          openItem(cdPlayItem);
-        }
-      }, 500);
+      return;
     }
-  }
-  step();
-}
+    setTimeout(finishBoot, 500);
+  })();
 
-window.bgPlayerStarted = false;
-window.bgAudioPlayer = null;
+  function finishBoot() {
+    if (screen) screen.classList.add('done');
+    SND.success();
 
-function initBgPlayer() {
-  if (typeof BG_MUSIC_SRC !== 'undefined' && BG_MUSIC_SRC) {
-    window.bgAudioPlayer = new Audio(BG_MUSIC_SRC);
-    window.bgAudioPlayer.loop = true;
-    
-    const startPlay = () => {
-      if (window.bgPlayerStarted) return;
-      window.bgPlayerStarted = true;
-      window.bgAudioPlayer.play().catch(e => {
-        console.log("Autoplay bloqueado. Se reproducirá al interactuar:", e);
-      });
-      const statusText = document.getElementById('cd-status');
-      if (statusText) statusText.textContent = 'PLAYING';
-      
-      document.removeEventListener('pointerdown', startPlay);
-      document.removeEventListener('click', startPlay);
-    };
-    
-    document.addEventListener('pointerdown', startPlay);
-    document.addEventListener('click', startPlay);
+    // La musica de fondo empieza sola; si el navegador la bloquea,
+    // AudioHub reintenta en el primer gesto del usuario.
+    AudioHub.play(BG_MUSIC_SRC, { loop: true });
+
+    const cdPlayer = DESKTOP_ITEMS.find(item => item.special === 'ytplayer');
+    if (cdPlayer) openItem(cdPlayer);
   }
 }
 
+/* ================= INICIALIZACION ================= */
 function init() {
   renderDesktop();
-  renderStartMenu();
+  StartMenu.render();
+  StartMenu.bind();
+
   updateClock();
   setInterval(updateClock, 1000);
+
   runBoot();
-  initBgPlayer();
-  
-  // Inicialización del AudioContext en la primera interacción
-  document.body.addEventListener('pointerdown', () => SND.init(), { once: true });
+
+  // El AudioContext de los bips solo puede crearse tras un gesto del usuario.
+  document.addEventListener('pointerdown', () => SND.init(), { once: true });
 }
 
-// Iniciar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', init);

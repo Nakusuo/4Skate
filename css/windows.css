@@ -7,8 +7,8 @@
   position:absolute;
   min-width:220px;
   background:var(--cream);
-  box-shadow:inset 1px 1px 0 #fff,inset -1px -1px 0 var(--shadow),2px 2px 0 rgba(74,53,80,.4);
-  border:1px solid var(--ink);
+  border:2px solid var(--ink);
+  box-shadow:inset 2px 2px 0 #fff,6px 6px 0 rgba(43,31,92,.3);
   display:flex;
   flex-direction:column;
 }
@@ -18,67 +18,82 @@
 
 /* ---------- BARRA DE TITULO ---------- */
 .titlebar{
-  height:24px;
+  height:26px;
   flex:0 0 auto;
   display:flex;
   align-items:center;
-  gap:5px;
-  background:linear-gradient(90deg,var(--blush-deep),var(--lilac-deep));
+  gap:6px;
+  background:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.14) 0 1px,transparent 1px 3px),
+    linear-gradient(90deg,var(--blush-deep),var(--lilac-deep));
+  border-bottom:2px solid var(--ink);
   color:#fff;
-  padding:0 4px;
+  padding:0 4px 0 6px;
   cursor:default;
   user-select:none;
   touch-action:none;               /* el arrastre no debe hacer scroll de la pagina */
 }
-.window.inactive .titlebar{background:linear-gradient(90deg,#e9c6d6,#cdb8de);color:#fdf0f6;}
+.window.inactive .titlebar{
+  background:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.2) 0 1px,transparent 1px 3px),
+    linear-gradient(90deg,#F3D3E7,#DCD3F5);
+  color:var(--ink);
+}
+.window.inactive .titlebar .ttext{text-shadow:none;opacity:.75;}
 .titlebar .ticon{font-size:14px;line-height:1;}
 .titlebar .ttext{
   flex:1;
   min-width:0;
+  font-family:var(--font-title);
   font-size:12px;
-  font-weight:bold;
+  letter-spacing:.3px;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  text-shadow:1px 1px 0 rgba(0,0,0,.2);
+  text-shadow:1px 1px 0 var(--ink);
 }
 
-.titlebar-btns{display:flex;gap:2px;flex:0 0 auto;}
+.titlebar-btns{display:flex;gap:3px;flex:0 0 auto;}
 .titlebar-btn{
-  width:17px;
-  height:15px;
+  width:18px;
+  height:17px;
   padding:0;
-  background:var(--blush);
-  border-top:1px solid #fff;
-  border-left:1px solid #fff;
-  border-bottom:1px solid var(--shadow);
-  border-right:1px solid var(--shadow);
+  background:var(--cream);
+  border:2px solid var(--ink);
+  box-shadow:inset -2px -2px 0 var(--lilac);
+  font-family:var(--font-title);
   font-size:10px;
-  line-height:13px;
+  line-height:12px;
   text-align:center;
   color:var(--ink);
-  font-weight:bold;
 }
-.titlebar-btn:active{border-color:var(--shadow) var(--shadow) #fff #fff;}
+.titlebar-btn:hover{background:#fff;}
+.titlebar-btn.tb-close{background:var(--blush);box-shadow:inset -2px -2px 0 var(--rose);}
+.titlebar-btn.tb-close:hover{background:var(--blush-deep);color:#fff;}
+.titlebar-btn:active{box-shadow:inset 2px 2px 0 var(--lilac-deep);}
 
 /* ---------- CUERPO ---------- */
 .pathbar{
   flex:0 0 auto;
-  background:var(--paper);
-  border-bottom:1px solid var(--rose);
-  font-size:11px;
-  padding:3px 6px;
+  background:var(--lilac);
+  border-bottom:2px solid var(--ink);
+  font-size:12px;
+  padding:4px 6px;
   display:flex;
   align-items:center;
-  gap:5px;
-  color:var(--shadow);
+  gap:6px;
+  color:var(--ink);
 }
 .pathbar .pbox{
   flex:1;
   min-width:0;
   background:#fff;
-  border:1px solid var(--shadow);
-  padding:2px 5px;
+  border:2px solid var(--ink);
+  box-shadow:inset 2px 2px 0 rgba(43,31,92,.15);
+  padding:1px 6px;
+  font-family:var(--font-mono);
+  font-size:16px;
+  line-height:1.1;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -96,16 +111,17 @@
 
 .statusbar{
   flex:0 0 auto;
-  height:18px;
-  border-top:1px solid var(--shadow);
+  height:20px;
+  border-top:2px solid var(--ink);
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:8px;
-  font-size:10px;
+  font-family:var(--font-mono);
+  font-size:15px;
   padding:0 6px;
-  color:var(--shadow);
-  background:var(--blush);
+  color:var(--ink);
+  background:var(--lilac);
   white-space:nowrap;
   overflow:hidden;
 }
@@ -114,18 +130,18 @@
 .icon-grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(var(--icon-w),1fr));
-  gap:4px;
+  gap:6px;
   align-content:flex-start;
 }
 .icon-grid .icon{width:100%;}
-.icon-grid .icon .label{color:var(--ink);text-shadow:none;max-width:100%;}
-.icon-grid .icon.selected .label{background:var(--lilac-deep);color:#fff;}
+.icon-grid .icon .label{background:none;border-color:transparent;box-shadow:none;max-width:100%;}
+.icon-grid .icon.selected .label{background:var(--blush-deep);border-color:var(--ink);color:#fff;}
 
 /* ---------- DIALOGOS ---------- */
 .dialog-body{display:flex;gap:12px;padding:6px;align-items:flex-start;}
-.dialog-icon{font-size:28px;flex:0 0 auto;}
-.dialog-text{font-size:12px;line-height:1.5;}
-.dialog-btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:14px;}
+.dialog-icon{font-size:28px;flex:0 0 auto;filter:drop-shadow(2px 2px 0 rgba(43,31,92,.35));}
+.dialog-text{font-size:13px;line-height:1.5;}
+.dialog-btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-top:14px;}
 .dialog-btns .pixel-btn{min-width:76px;padding:5px 12px;}
 
 /* ---------- ASA DE REDIMENSIONADO ---------- */
@@ -138,7 +154,8 @@
   cursor:se-resize;
   touch-action:none;
   z-index:10;
-  background-image:linear-gradient(135deg,transparent 30%,var(--shadow) 30% 40%,transparent 40% 60%,var(--shadow) 60% 70%,transparent 70%);
+  background-image:linear-gradient(135deg,transparent 30%,var(--ink) 30% 40%,transparent 40% 60%,var(--ink) 60% 70%,transparent 70%);
   background-size:4px 4px;
+  opacity:.6;
 }
 .window.maximized .win-resize-handle{display:none;}

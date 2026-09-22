@@ -1,20 +1,22 @@
 /* ================= ESCRITORIO, ICONOS, BARRA DE TAREAS Y MENU (desktop.css) ================= */
 
 /* ---------- ESCRITORIO ---------- */
+/* Fondo pastel con rejilla de pixel, destellos y un filtro CRT encima
+   (lineas de barrido + viñeta). */
 #desktop{
   position:fixed;
   inset:0;
   bottom:var(--taskbar-h);
   background:
-    radial-gradient(circle at 15% 20%, rgba(255,255,255,.5) 0, transparent 2px),
-    radial-gradient(circle at 65% 10%, rgba(255,255,255,.4) 0, transparent 2px),
-    radial-gradient(circle at 85% 45%, rgba(255,255,255,.5) 0, transparent 2px),
-    radial-gradient(circle at 30% 70%, rgba(255,255,255,.4) 0, transparent 2px),
-    radial-gradient(circle at 50% 85%, rgba(255,255,255,.5) 0, transparent 2px),
-    radial-gradient(circle at 90% 80%, rgba(255,255,255,.4) 0, transparent 2px),
-    radial-gradient(circle at 10% 90%, rgba(255,255,255,.4) 0, transparent 2px),
-    linear-gradient(160deg, var(--blush) 0%, var(--lilac) 55%, var(--lilac-deep) 100%);
-  background-size:60px 60px,70px 70px,55px 55px,65px 65px,75px 75px,50px 50px,68px 68px,100% 100%;
+    radial-gradient(circle at 15% 20%, #fff 0 1.5px, transparent 2px),
+    radial-gradient(circle at 65% 10%, #fff 0 1.5px, transparent 2px),
+    radial-gradient(circle at 85% 45%, #fff 0 1.5px, transparent 2px),
+    radial-gradient(circle at 30% 70%, #fff 0 1.5px, transparent 2px),
+    radial-gradient(circle at 90% 80%, #fff 0 1.5px, transparent 2px),
+    linear-gradient(rgba(255,255,255,.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.35) 1px, transparent 1px),
+    linear-gradient(165deg, #FFC9E8 0%, var(--lilac) 50%, #B7A6F5 100%);
+  background-size:120px 120px,140px 140px,110px 110px,130px 130px,150px 150px,24px 24px,24px 24px,100% 100%;
   overflow:hidden;
 }
 #desktop::after{
@@ -22,7 +24,9 @@
   position:absolute;
   inset:0;
   pointer-events:none;
-  background:repeating-linear-gradient(0deg,rgba(74,53,80,.025) 0 1px,transparent 1px 3px);
+  background:
+    radial-gradient(ellipse at center, transparent 55%, rgba(43,31,92,.22) 100%),
+    repeating-linear-gradient(0deg, rgba(43,31,92,.05) 0 1px, transparent 1px 3px);
 }
 
 /* ---------- ICONOS ---------- */
@@ -33,13 +37,14 @@
   inset:14px auto 14px 10px;
   display:grid;
   grid-auto-flow:column;
-  grid-template-rows:repeat(auto-fill,minmax(74px,max-content));
+  grid-template-rows:repeat(auto-fill,minmax(78px,max-content));
   grid-auto-columns:var(--icon-w);
   justify-content:start;
-  gap:6px 4px;
+  gap:6px 6px;
   max-width:calc(100% - 20px);
   overflow-x:auto;
   overflow-y:hidden;
+  z-index:1;
 }
 
 .icon{
@@ -47,7 +52,7 @@
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:3px;
+  gap:4px;
   padding:4px 2px;
   user-select:none;
   background:none;
@@ -60,40 +65,45 @@
   align-items:center;
   justify-content:center;
   font-size:30px;
-  filter:drop-shadow(1px 1px 0 rgba(74,53,80,.45));
+  filter:drop-shadow(2px 2px 0 rgba(43,31,92,.45));
   position:relative;
+  transition:transform .15s;
 }
+.icon:hover .glyph{transform:translateY(-2px);}
 .icon .glyph svg{width:calc(var(--icon-glyph) - 2px);height:calc(var(--icon-glyph) - 2px);}
 .icon .badge{
   position:absolute;
   bottom:-4px;
   right:-6px;
   font-size:15px;
-  filter:drop-shadow(1px 1px 0 rgba(74,53,80,.6));
+  filter:drop-shadow(1px 1px 0 rgba(43,31,92,.6));
 }
 .icon .label{
-  color:#fff;
+  color:var(--ink);
+  background:rgba(255,245,251,.85);
+  border:1px solid var(--ink);
   font-size:11px;
   text-align:center;
   line-height:1.2;
-  text-shadow:1px 1px 0 var(--ink),-1px -1px 0 var(--ink),1px -1px 0 var(--ink),-1px 1px 0 var(--ink);
-  padding:1px 3px;
+  padding:1px 4px;
   max-width:calc(var(--icon-w) - 2px);
   overflow-wrap:anywhere;
+  box-shadow:2px 2px 0 rgba(43,31,92,.25);
 }
-.icon.selected .label{background:var(--lilac-deep);outline:1px dotted #fff;text-shadow:none;}
-.icon.locked .glyph{filter:grayscale(.55) opacity(.7);}
+.icon.selected .label{background:var(--blush-deep);color:#fff;outline:1px dotted var(--ink);outline-offset:1px;}
+.icon.locked .glyph{filter:grayscale(.55) opacity(.7) drop-shadow(2px 2px 0 rgba(43,31,92,.3));}
 
 /* ---------- BARRA DE TAREAS ---------- */
 #taskbar{
   position:fixed;
   left:0;right:0;bottom:0;
   height:var(--taskbar-h);
-  background:linear-gradient(180deg,var(--blush) 0%,var(--lilac) 100%);
-  border-top:2px solid #fff;
+  background:var(--cream);
+  border-top:2px solid var(--ink);
+  box-shadow:inset 0 2px 0 #fff,inset 0 -3px 0 var(--lilac);
   display:flex;
   align-items:center;
-  padding:0 4px;
+  padding:0 5px;
   gap:6px;
   z-index:5000;
 }
@@ -101,22 +111,27 @@
   display:flex;
   align-items:center;
   gap:5px;
-  font-weight:bold;
+  font-family:var(--font-title);
   font-size:12px;
-  height:26px;
+  height:25px;
   padding:0 10px 0 6px;
   flex:0 0 auto;
+  background:linear-gradient(180deg,#FFB3DE,var(--blush-deep));
+  box-shadow:inset 2px 2px 0 rgba(255,255,255,.7),inset -2px -2px 0 #E06AAE,2px 2px 0 var(--ink);
+  color:#fff;
+  text-shadow:1px 1px 0 var(--ink);
 }
-#start-btn .flag{font-size:14px;}
-#start-btn.active{border-color:var(--shadow) var(--shadow) #fff #fff;}
+#start-btn .flag{font-size:14px;text-shadow:none;}
+#start-btn.active{transform:translate(2px,2px);box-shadow:inset 2px 2px 0 #E06AAE;}
 
-.tb-sep{width:2px;height:24px;border-left:1px solid var(--shadow);border-right:1px solid #fff;}
+.tb-sep{width:2px;height:22px;background:var(--ink);opacity:.5;}
 
 #taskbar-apps{
   flex:1 1 auto;
   display:flex;
-  gap:4px;
-  height:26px;
+  gap:6px;
+  height:28px;
+  align-items:center;
   min-width:0;
   overflow-x:auto;
   overflow-y:hidden;
@@ -125,7 +140,7 @@
 #taskbar-apps::-webkit-scrollbar{display:none;}
 
 .taskbar-app{
-  height:26px;
+  height:24px;
   flex:1 1 120px;
   min-width:40px;
   max-width:160px;
@@ -133,13 +148,20 @@
   align-items:center;
   gap:5px;
   padding:0 8px;
-  font-size:11px;
+  font-size:12px;
   white-space:nowrap;
   overflow:hidden;
+  background:var(--lilac);
+  box-shadow:inset 2px 2px 0 rgba(255,255,255,.8),inset -2px -2px 0 var(--lilac-deep),2px 2px 0 var(--ink);
 }
 .taskbar-app .tba-label{overflow:hidden;text-overflow:ellipsis;}
 .taskbar-app .tba-icon{flex:0 0 auto;}
-.taskbar-app.active{border-color:var(--shadow) var(--shadow) #fff #fff;}
+.taskbar-app.active{
+  transform:translate(2px,2px);
+  background:var(--blush);
+  box-shadow:inset 2px 2px 0 var(--rose);
+  font-weight:600;
+}
 
 #systray{
   flex:0 0 auto;
@@ -147,34 +169,37 @@
   padding:0 10px;
   display:flex;
   align-items:center;
-  font-size:11px;
   gap:6px;
-  border-top:1px solid var(--shadow);
-  border-left:1px solid var(--shadow);
-  border-bottom:1px solid #fff;
-  border-right:1px solid #fff;
-  background:var(--blush);
+  font-family:var(--font-mono);
+  font-size:17px;
+  color:var(--phosphor);
+  text-shadow:var(--glow);
+  background:var(--crt-bg);
+  border:2px solid var(--ink);
 }
 
 /* ---------- MENU DE INICIO ---------- */
 #start-menu{
   position:fixed;
-  left:2px;
-  bottom:calc(var(--taskbar-h) + 2px);
-  width:210px;
+  left:4px;
+  bottom:calc(var(--taskbar-h) + 4px);
+  width:220px;
   max-width:calc(100vw - 8px);
   display:none;
   z-index:5001;
   background:var(--cream);
-  box-shadow:inset 1px 1px 0 #fff,inset -1px -1px 0 var(--shadow),2px 2px 0 rgba(74,53,80,.4);
-  border:1px solid var(--ink);
+  border:2px solid var(--ink);
+  box-shadow:inset 2px 2px 0 #fff,var(--drop);
 }
 #start-menu.open{display:flex;}
 
 .start-side{
-  width:26px;
-  flex:0 0 26px;
-  background:linear-gradient(180deg,var(--blush-deep),var(--lilac-deep));
+  width:28px;
+  flex:0 0 28px;
+  background:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.12) 0 2px,transparent 2px 4px),
+    linear-gradient(180deg,var(--lilac-deep),var(--blush-deep));
+  border-right:2px solid var(--ink);
   display:flex;
   align-items:flex-end;
   justify-content:center;
@@ -184,10 +209,10 @@
   writing-mode:vertical-rl;
   transform:rotate(180deg);
   color:#fff;
-  font-weight:bold;
+  font-family:var(--font-title);
   font-size:13px;
   letter-spacing:1px;
-  text-shadow:1px 1px 0 rgba(0,0,0,.25);
+  text-shadow:1px 1px 0 var(--ink);
 }
 
 .start-list{flex:1;padding:4px;display:flex;flex-direction:column;min-width:0;}
@@ -196,12 +221,12 @@
   align-items:center;
   gap:8px;
   padding:6px 8px;
-  font-size:12px;
+  font-size:13px;
   color:var(--ink);
   background:none;
   border:0;
   text-align:left;
   user-select:none;
 }
-.menu-item:hover,.menu-item:focus-visible{background:var(--lilac-deep);color:#fff;}
-.menu-sep{height:1px;background:var(--rose);margin:4px 2px;}
+.menu-item:hover,.menu-item:focus-visible{background:var(--blush-deep);color:#fff;outline:none;}
+.menu-sep{height:0;border-top:2px dotted var(--lilac-deep);margin:4px 2px;}

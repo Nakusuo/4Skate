@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>4_meses</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
-<meta name="theme-color" content="#D9C2EC">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&family=Pixelify+Sans:wght@400;600&family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#D9CCFF">
 <meta name="description" content="WinGei 98 — una cápsula del tiempo de 4 meses.">
 <link rel="stylesheet" href="css/variables.css">
 <link rel="stylesheet" href="css/desktop.css">
@@ -16,8 +16,10 @@
 </head>
 <body>
 
-<div id="boot-screen">
-  <div>WinGei98 BIOS v4.0<br>(C) cápsula del tiempo, todos los derechos del corazón reservados<br><br></div>
+<div id="boot-screen" class="crt">
+  <div class="boot-kicker">═ BIOS v4.0 ═</div>
+  <div class="boot-logo">WinGei98</div>
+  <div class="boot-sub">(C) cápsula del tiempo · todos los derechos del corazón reservados</div>
   <div id="boot-lines"></div>
   <div id="boot-bar"><div id="boot-bar-fill"></div></div>
   <div class="boot-caption">cargando 4 meses<span class="blink">_</span></div>
@@ -41,7 +43,7 @@
   <div id="systray"><span id="clock">00:00</span></div>
 </div>
 
-<div id="shutdown-screen">
+<div id="shutdown-screen" class="crt">
   <div class="big" id="shutdown-msg">Ya puede apagar el equipo.</div>
   <div class="final" id="shutdown-final"></div>
 </div>

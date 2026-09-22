@@ -32,12 +32,12 @@
   .icon .label{font-size:10px;}
 
   /* Botones del sistema mas grandes para el dedo */
-  #start-btn{height:30px;padding:0 12px 0 8px;}
-  .taskbar-app{height:30px;flex:1 1 90px;}
-  #systray{height:28px;}
+  #start-btn{height:28px;padding:0 12px 0 8px;}
+  .taskbar-app{height:28px;flex:1 1 90px;}
+  #systray{height:28px;font-size:16px;}
 
   .titlebar{height:28px;}
-  .titlebar-btn{width:22px;height:20px;line-height:18px;font-size:11px;}
+  .titlebar-btn{width:22px;height:20px;line-height:16px;font-size:11px;}
 
   .window-body{padding:8px;}
   .dialog-btns .pixel-btn{min-width:88px;padding:7px 14px;}
@@ -46,8 +46,8 @@
   #start-menu{width:min(260px,calc(100vw - 8px));}
   .menu-item{padding:9px 8px;}
 
-  .player-lcd{font-size:11px;padding:5px 8px;}
-  .player-transport .pixel-btn{min-height:32px;font-size:11px;}
+  .player-lcd{font-size:16px;padding:5px 8px;}
+  .player-transport .pixel-btn{min-height:32px;font-size:12px;}
   .player-seek{height:16px;}
   .player-caption,.illo-caption{max-width:100%;}
 }
